@@ -1,7 +1,7 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import { logJumpAction } from '@/app/actions/metrics';
 import Link from 'next/link';
+import JumpLogger from '@/components/jump-logger';
 
 export default async function DashboardPage() {
   const supabase = await createServerSupabaseClient();
@@ -11,7 +11,6 @@ export default async function DashboardPage() {
     redirect('/login');
   }
 
-  // Fetch vertical jump logs for current user
   const { data: logs } = await supabase
     .from('vertical_jump_logs')
     .select('*')
@@ -20,7 +19,6 @@ export default async function DashboardPage() {
 
   const totalLogs = logs?.length || 0;
   
-  // Calculate absolute highest vertical jump (max of standing or running across all logs)
   let maxVerticalCm = 0;
   if (logs && logs.length > 0) {
     logs.forEach((log) => {
@@ -76,47 +74,8 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* Log Jump Form */}
-        <div className="bg-neutral-900 border border-neutral-800 p-6 rounded space-y-4">
-          <h2 className="text-lg font-bold font-mono uppercase">Log New Jump Test</h2>
-          
-          <form action={logJumpAction} className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-            <div>
-              <label className="block text-xs text-gray-400 font-mono mb-2 uppercase">
-                Standing Vertical (CM)
-              </label>
-              <input
-                type="number"
-                step="0.1"
-                name="standingVertical"
-                placeholder="e.g. 75"
-                required
-                className="w-full bg-black border border-neutral-800 rounded p-3 text-white focus:outline-none focus:border-red-600"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs text-gray-400 font-mono mb-2 uppercase">
-                Running Vertical (CM)
-              </label>
-              <input
-                type="number"
-                step="0.1"
-                name="runningVertical"
-                placeholder="e.g. 88"
-                required
-                className="w-full bg-black border border-neutral-800 rounded p-3 text-white focus:outline-none focus:border-red-600"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded uppercase tracking-wider transition-colors cursor-pointer"
-            >
-              Record Result →
-            </button>
-          </form>
-        </div>
+        {/* Log Jump Form (Client Component) */}
+        <JumpLogger userId={user.id} />
 
       </div>
     </div>
