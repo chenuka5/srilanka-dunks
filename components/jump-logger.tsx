@@ -11,18 +11,18 @@ export default function JumpLogger({ userId }: JumpLoggerProps) {
   const [standing, setStanding] = useState('');
   const [running, setRunning] = useState('');
   const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
+  const [statusMsg, setStatusMsg] = useState<{ type: 'error' | 'success'; text: string } | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    setErrorMsg('');
+    setStatusMsg(null);
 
     const standingNum = parseFloat(standing);
     const runningNum = parseFloat(running);
 
     if (isNaN(standingNum) || isNaN(runningNum)) {
-      setErrorMsg('Please enter valid numbers for both measurements.');
+      setStatusMsg({ type: 'error', text: 'Please enter valid numbers.' });
       setLoading(false);
       return;
     }
@@ -30,31 +30,39 @@ export default function JumpLogger({ userId }: JumpLoggerProps) {
     try {
       const supabase = createClient();
       
-      const { data, error } = await supabase
-        .from('vertical_jump_logs')
-        .insert({
-          profile_id: userId,
-          standing_vertical_cm: standingNum,
-          running_vertical_cm: runningNum,
-        })
-        .select();
+      // Get session user directly from Supabase client
+      const { data: { session } } = await supabase.auth.getSession();
+      const activeUserId = session?.user?.id || userId;
 
-      if (error) {
-        console.error('Supabase Direct Insert Error:', error);
-        setErrorMsg(`Database error: ${error.message}`);
+      if (!activeUserId) {
+        setStatusMsg({ type: 'error', text: 'User session not found. Please log in again.' });
         setLoading(false);
         return;
       }
 
-      // Reset input fields
+      const { error } = await supabase
+        .from('vertical_jump_logs')
+        .insert({
+          profile_id: activeUserId,
+          standing_vertical_cm: standingNum,
+          running_vertical_cm: runningNum,
+        });
+
+      if (error) {
+        console.error('Supabase Error:', error);
+        setStatusMsg({ type: 'error', text: `Database error: ${error.message}` });
+        setLoading(false);
+        return;
+      }
+
+      setStatusMsg({ type: 'success', text: 'Recorded! Refreshing...' });
       setStanding('');
       setRunning('');
-      
-      // Reload page to refresh server components and display updated stats
+
       window.location.reload();
     } catch (err: any) {
       console.error('Unexpected Error:', err);
-      setErrorMsg(err.message || 'An unexpected error occurred.');
+      setStatusMsg({ type: 'error', text: err.message || 'An unexpected error occurred.' });
       setLoading(false);
     }
   }
@@ -63,9 +71,15 @@ export default function JumpLogger({ userId }: JumpLoggerProps) {
     <div className="bg-neutral-900 border border-neutral-800 p-6 rounded space-y-4">
       <h2 className="text-lg font-bold font-mono uppercase">Log New Jump Test</h2>
       
-      {errorMsg && (
-        <div className="p-3 bg-red-950/50 border border-red-600 rounded text-red-400 text-xs font-mono">
-          {errorMsg}
+      {statusMsg && (
+        <div
+          className={`p-3 rounded text-xs font-mono border ${
+            statusMsg.type === 'error'
+              ? 'bg-red-950/50 border-red-600 text-red-400'
+              : 'bg-green-950/50 border-green-600 text-green-400'
+          }`}
+        >
+          {statusMsg.text}
         </div>
       )}
 
