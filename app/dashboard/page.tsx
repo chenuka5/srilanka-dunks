@@ -20,12 +20,20 @@ export default async function DashboardPage() {
 
   const totalLogs = logs?.length || 0;
   
-  // Get max standing vertical converted to inches for display
-  const maxStandingCm = logs && logs.length > 0 
-    ? Math.max(...logs.map(l => l.standing_vertical_cm || 0)) 
-    : 0;
-  const maxStandingInches = (maxStandingCm / 2.54).toFixed(1);
-
+  // Calculate absolute highest vertical jump (max of standing or running across all logs)
+  let maxVerticalCm = 0;
+  if (logs && logs.length > 0) {
+    logs.forEach((log) => {
+      const standing = log.standing_vertical_cm || 0;
+      const running = log.running_vertical_cm || 0;
+      const highestInLog = Math.max(standing, running);
+      if (highestInLog > maxVerticalCm) {
+        maxVerticalCm = highestInLog;
+      }
+    });
+  }
+  
+  const maxVerticalInches = maxVerticalCm > 0 ? (maxVerticalCm / 2.54).toFixed(1) : '0.0';
   const firstName = user.user_metadata?.first_name || 'ATHLETE';
 
   return (
@@ -50,8 +58,8 @@ export default async function DashboardPage() {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-neutral-900 border border-neutral-800 p-6 rounded">
-            <p className="text-xs text-neutral-400 font-mono uppercase">Max Standing Vertical</p>
-            <p className="text-4xl font-extrabold mt-2">{maxStandingInches} <span className="text-sm font-normal text-neutral-500">INCHES</span></p>
+            <p className="text-xs text-neutral-400 font-mono uppercase">Max Vertical</p>
+            <p className="text-4xl font-extrabold mt-2">{maxVerticalInches} <span className="text-sm font-normal text-neutral-500">INCHES</span></p>
           </div>
 
           <div className="bg-neutral-900 border border-neutral-800 p-6 rounded">
@@ -103,7 +111,7 @@ export default async function DashboardPage() {
 
             <button
               type="submit"
-              className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded uppercase tracking-wider transition-colors"
+              className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded uppercase tracking-wider transition-colors cursor-pointer"
             >
               Record Result →
             </button>
