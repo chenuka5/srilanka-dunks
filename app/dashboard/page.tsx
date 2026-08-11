@@ -3,6 +3,9 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import JumpLogger from '@/components/jump-logger';
 
+// THIS FIXES THE CACHE ISSUE:
+export const dynamic = 'force-dynamic';
+
 export default async function DashboardPage() {
   const supabase = await createServerSupabaseClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -11,10 +14,11 @@ export default async function DashboardPage() {
     redirect('/login');
   }
 
+  // Fetch vertical jump logs for current user
   const { data: logs } = await supabase
     .from('vertical_jump_logs')
     .select('*')
-    .eq('profile_id', user.id)
+    .eq('profile_id', user.id) // Ensure we are looking for THIS user's logs
     .order('created_at', { ascending: false });
 
   const totalLogs = logs?.length || 0;
@@ -74,7 +78,7 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* Log Jump Form (Client Component) */}
+        {/* Log Jump Form */}
         <JumpLogger userId={user.id} />
 
       </div>

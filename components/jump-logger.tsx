@@ -2,12 +2,14 @@
 
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { useRouter } from 'next/navigation'; // <-- Import useRouter
 
 interface JumpLoggerProps {
   userId: string;
 }
 
 export default function JumpLogger({ userId }: JumpLoggerProps) {
+  const router = useRouter(); // <-- Initialize router
   const [standing, setStanding] = useState('');
   const [running, setRunning] = useState('');
   const [loading, setLoading] = useState(false);
@@ -30,7 +32,6 @@ export default function JumpLogger({ userId }: JumpLoggerProps) {
     try {
       const supabase = createClient();
       
-      // Get session user directly from Supabase client
       const { data: { session } } = await supabase.auth.getSession();
       const activeUserId = session?.user?.id || userId;
 
@@ -55,11 +56,19 @@ export default function JumpLogger({ userId }: JumpLoggerProps) {
         return;
       }
 
-      setStatusMsg({ type: 'success', text: 'Recorded! Refreshing...' });
+      setStatusMsg({ type: 'success', text: 'Recorded! Updating stats...' });
       setStanding('');
       setRunning('');
 
-      window.location.reload();
+      // <-- Tell Next.js to fetch fresh data from the server
+      router.refresh(); 
+      
+      // Clear the success message after a moment
+      setTimeout(() => {
+        setStatusMsg(null);
+        setLoading(false);
+      }, 2000);
+
     } catch (err: any) {
       console.error('Unexpected Error:', err);
       setStatusMsg({ type: 'error', text: err.message || 'An unexpected error occurred.' });
