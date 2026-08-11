@@ -1,7 +1,12 @@
-import React from 'react';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import Button from '@/components/ui/Button';
+import Link from 'next/link';
+
+// NOTE: If you renamed your component file earlier to remove the "s", 
+// change this import to '@/components/workout-tracker'
+import WorkoutTracker from '@/components/workouts-tracker';
+
+export const dynamic = 'force-dynamic';
 
 export default async function WorkoutsPage() {
   const supabase = await createServerSupabaseClient();
@@ -11,86 +16,68 @@ export default async function WorkoutsPage() {
     redirect('/login');
   }
 
-  // Fetch the 4-Week Foundation Program along with weeks, workouts, and exercises
-  const { data: program } = await supabase
-    .from('programs')
+  // Fetch active workouts and exercises
+  const { data: workouts, error } = await supabase
+    .from('workouts')
     .select(`
       *,
-      program_weeks (
-        *,
-        workouts (
-          *,
-          workout_exercises (
-            *,
-            exercises (*)
-          )
+      workout_exercises (
+        id,
+        sets,
+        reps,
+        rest_period_seconds,
+        exercises (
+          name,
+          category,
+          description
         )
       )
-    `)
-    .eq('id', '11111111-1111-1111-1111-111111111111')
-    .single();
+    `);
+
+  if (error) {
+    console.error('Error fetching workouts:', error.message);
+  }
+
+  // Fetch completed sets for current user
+  const { data: completions } = await supabase
+    .from('workout_completions')
+    .select('*')
+    .eq('profile_id', user.id);
 
   return (
-    <div className="min-h-screen bg-brand-black py-32 px-6">
-      <div className="max-w-7xl mx-auto space-y-12">
+    <div className="min-h-screen bg-black text-white p-6 md:p-12">
+      <div className="max-w-6xl mx-auto space-y-8">
         
         {/* Navigation / Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-brand-gray-900 pb-8 gap-4">
+        <div className="flex justify-between items-center border-b border-neutral-800 pb-6">
           <div>
-            <Button href="/dashboard" variant="outline" className="text-xs mb-4">← Back to Dashboard</Button>
-            <h1 className="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter">
-              {program?.title || 'TRAINING PROGRAM'}
+            <Link 
+              href="/dashboard" 
+              className="text-xs font-mono text-neutral-400 hover:text-white uppercase tracking-wider transition-colors inline-block mb-2"
+            >
+              ← Back to Dashboard
+            </Link>
+            <h1 className="text-3xl md:text-5xl font-extrabold uppercase tracking-tight">
+              4-Week Foundation Workouts
             </h1>
-            <p className="text-brand-gray-400 text-sm mt-2">{program?.description}</p>
           </div>
         </div>
 
-        {/* Weeks & Workouts Grid */}
-        <div className="space-y-12">
-          {program?.program_weeks?.map((week: any) => (
-            <div key={week.id} className="bg-brand-surface p-8 border border-brand-gray-900">
-              <div className="border-b border-brand-gray-800 pb-4 mb-8">
-                <span className="text-brand-crimson font-bold uppercase tracking-widest text-xs">
-                  WEEK {week.week_number}
-                </span>
-                <h2 className="text-2xl font-black text-white uppercase tracking-tighter">
-                  {week.focus_description}
-                </h2>
-              </div>
-
-              {/* Workouts inside the week */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {week.workouts?.map((workout: any) => (
-                  <div key={workout.id} className="bg-brand-black p-6 border border-brand-gray-800">
-                    <h3 className="text-xl font-black text-white uppercase tracking-tighter mb-2">
-                      {workout.title}
-                    </h3>
-                    <p className="text-brand-gray-400 text-xs mb-6">{workout.description}</p>
-
-                    {/* Exercise List */}
-                    <div className="space-y-4">
-                      {workout.workout_exercises?.map((item: any) => (
-                        <div key={item.id} className="p-4 bg-brand-surface border border-brand-gray-900 flex justify-between items-center">
-                          <div>
-                            <span className="text-brand-gold text-[10px] font-bold uppercase tracking-widest block">
-                              {item.exercises?.category}
-                            </span>
-                            <h4 className="text-white font-bold text-sm uppercase">{item.exercises?.name}</h4>
-                            <p className="text-brand-gray-400 text-xs mt-1">{item.notes}</p>
-                          </div>
-                          <div className="text-right">
-                            <span className="text-brand-crimson font-black text-sm block">{item.sets} SETS</span>
-                            <span className="text-white text-xs font-bold">{item.reps}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
+        {/* Workouts Interactive Tracker */}
+        {workouts && workouts.length > 0 ? (
+          <WorkoutTracker 
+            userId={user.id} 
+            workouts={workouts} 
+            initialCompletions={completions || []} 
+          />
+        ) : (
+          <div className="bg-neutral-900 border border-neutral-800 p-8 rounded text-center space-y-3">
+            <h2 className="text-xl font-bold font-mono uppercase text-neutral-300">No Workouts Found</h2>
+            <p className="text-sm text-neutral-500 max-w-md mx-auto font-mono">
+              Workouts for the 4-Week Foundation program have not been added to your Supabase tables yet.
+            </p>
+          </div>
+        )}
 
       </div>
     </div>
