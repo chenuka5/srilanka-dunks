@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { logJumpAction } from '@/app/actions/metrics';
+import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 
 interface JumpLoggerProps {
   userId: string;
@@ -18,19 +18,43 @@ export default function JumpLogger({ userId }: JumpLoggerProps) {
     setLoading(true);
     setErrorMsg('');
 
-    try {
-      const formData = new FormData();
-      formData.append('standingVertical', standing);
-      formData.append('runningVertical', running);
-      formData.append('userId', userId);
+    const standingNum = parseFloat(standing);
+    const runningNum = parseFloat(running);
 
-      await logJumpAction(formData);
+    if (isNaN(standingNum) || isNaN(runningNum)) {
+      setErrorMsg('Please enter valid numbers for both measurements.');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const supabase = createBrowserSupabaseClient();
+      
+      const { data, error } = await supabase
+        .from('vertical_jump_logs')
+        .insert({
+          profile_id: userId,
+          standing_vertical_cm: standingNum,
+          running_vertical_cm: runningNum,
+        })
+        .select();
+
+      if (error) {
+        console.error('Supabase Direct Insert Error:', error);
+        setErrorMsg(`Database error: ${error.message}`);
+        setLoading(false);
+        return;
+      }
+
+      // Reset input fields
       setStanding('');
       setRunning('');
-      window.location.reload(); // Force refresh dashboard data immediately
+      
+      // Reload page to refresh server components and display updated stats
+      window.location.reload();
     } catch (err: any) {
-      setErrorMsg('Failed to log result. Please try again.');
-    } finally {
+      console.error('Unexpected Error:', err);
+      setErrorMsg(err.message || 'An unexpected error occurred.');
       setLoading(false);
     }
   }
@@ -40,7 +64,9 @@ export default function JumpLogger({ userId }: JumpLoggerProps) {
       <h2 className="text-lg font-bold font-mono uppercase">Log New Jump Test</h2>
       
       {errorMsg && (
-        <p className="text-red-500 text-xs font-mono">{errorMsg}</p>
+        <div className="p-3 bg-red-950/50 border border-red-600 rounded text-red-400 text-xs font-mono">
+          {errorMsg}
+        </div>
       )}
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
