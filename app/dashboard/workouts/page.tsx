@@ -2,8 +2,7 @@ import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 
-// NOTE: If you renamed your component file earlier to remove the "s", 
-// change this import to '@/components/workout-tracker'
+// EXACT MATCH FOR YOUR COMPONENT FILE
 import WorkoutTracker from '@/components/workouts-tracker';
 
 export const dynamic = 'force-dynamic';
