@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { createBrowserSupabaseClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 
 interface JumpLoggerProps {
   userId: string;
@@ -28,7 +28,7 @@ export default function JumpLogger({ userId }: JumpLoggerProps) {
     }
 
     try {
-      const supabase = createBrowserSupabaseClient();
+      const supabase = createClient();
       
       const { data, error } = await supabase
         .from('vertical_jump_logs')
