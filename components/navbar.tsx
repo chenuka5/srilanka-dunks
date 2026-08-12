@@ -5,12 +5,12 @@ export default function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-neutral-800 px-6 lg:px-12 py-3">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         
-        {/* Logo Link - Text removed, Logo size maximized */}
+        {/* Logo Link - Expanded size */}
         <Link href="/" className="flex items-center">
           <img 
             src="/logo.png" 
             alt="Sri Lanka Dunks Logo" 
-            className="h-16 w-auto object-contain" // Increased from h-10 to h-16
+            className="h-20 md:h-24 w-auto object-contain -my-3 transition-transform duration-300 hover:scale-105"
           />
         </Link>
 
