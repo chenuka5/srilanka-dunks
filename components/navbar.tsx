@@ -5,7 +5,7 @@ export default function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-neutral-800 px-6 lg:px-12 py-3">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         
-        {/* Logo Link - Expanded size */}
+        {/* Logo Link */}
         <Link href="/" className="flex items-center">
           <img 
             src="/logo.png" 
@@ -14,20 +14,20 @@ export default function Navbar() {
           />
         </Link>
 
-        {/* Navigation Links */}
-        <div className="hidden md:flex items-center gap-8 font-mono text-xs uppercase tracking-widest text-neutral-400">
+        {/* Navigation Links - ABOUT first, increased font size (text-sm md:text-base) */}
+        <div className="hidden md:flex items-center gap-8 font-mono text-sm md:text-base font-semibold uppercase tracking-wider text-neutral-300">
+          <Link href="/about" className="hover:text-red-600 transition-colors">About</Link>
           <Link href="/training" className="hover:text-red-600 transition-colors">Training</Link>
           <Link href="/camps" className="hover:text-red-600 transition-colors">Camps</Link>
           <Link href="/athletes" className="hover:text-red-600 transition-colors">Athletes</Link>
           <Link href="/vertical-jump-test" className="hover:text-red-600 transition-colors">Jump Test</Link>
-          <Link href="/about" className="hover:text-red-600 transition-colors">About</Link>
         </div>
 
         {/* Action Button */}
         <div>
           <Link 
             href="/join" 
-            className="bg-red-600 hover:bg-red-700 text-white font-mono text-xs uppercase tracking-widest px-5 py-2.5 rounded transition-colors"
+            className="bg-red-600 hover:bg-red-700 text-white font-mono text-sm uppercase tracking-widest px-6 py-3 rounded transition-colors font-bold"
           >
             Join Now
           </Link>
