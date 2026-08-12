@@ -13,18 +13,29 @@ export default function CampsPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // Step 3: Updated handleSubmit function connected to Supabase API endpoint
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    // Placeholder for database submission (e.g., Supabase / API route)
-    console.log('Submitting waitlist lead:', formData);
+    try {
+      const response = await fetch('/api/webinar-waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
 
-    // Simulate API request delay
-    setTimeout(() => {
+      if (response.ok) {
+        setIsSubmitted(true);
+      } else {
+        alert('There was an issue saving your registration. Please try again.');
+      }
+    } catch (err) {
+      console.error('Submission failed:', err);
+      alert('Failed to submit. Please check your internet connection.');
+    } finally {
       setLoading(false);
-      setIsSubmitted(true);
-    }, 800);
+    }
   };
 
   return (
@@ -133,9 +144,9 @@ export default function CampsPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-red-600 hover:bg-red-700 text-white font-mono text-xs md:text-sm uppercase tracking-widest py-4 rounded font-bold transition-all hover:scale-[1.02] shadow-lg shadow-red-600/20 disabled:opacity-50"
+                className="w-full bg-red-600 hover:bg-red-700 text-white font-mono text-xs md:text-sm uppercase tracking-widest py-4 rounded font-bold transition-all hover:scale-[1.02] shadow-lg shadow-red-600/20 disabled:opacity-50 cursor-pointer"
               >
-                {loading ? 'Processing...' : 'Join Free Webinar Waitlist →'}
+                {loading ? 'Saving to Supabase...' : 'Join Free Webinar Waitlist →'}
               </button>
             </form>
           ) : (
