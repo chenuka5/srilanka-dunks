@@ -2,50 +2,52 @@ import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <footer className="bg-black border-t border-neutral-900 pt-16 pb-8">
-      <div className="max-w-7xl mx-auto px-6 lg:px-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
-          
-          <div className="space-y-4 md:col-span-2">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="bg-red-600 text-white font-bold font-mono px-2 py-1 text-sm tracking-wider">
-                SD
-              </div>
-              <span className="font-extrabold tracking-tight uppercase text-lg">
-                Sri Lanka Dunks
-              </span>
-            </Link>
-            <p className="text-neutral-500 text-sm max-w-sm">
-              Modern athletic performance training for the next generation of Sri Lankan athletes. The goal was never just to dunk. It was to build better athletes.
-            </p>
+    <footer className="bg-black border-t border-neutral-900 py-16 px-6 lg:px-12 text-neutral-400 font-mono text-xs">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10">
+        
+        {/* Brand Column */}
+        <div className="space-y-4 md:col-span-2">
+          <div className="flex items-center gap-3">
+            <img 
+              src="/logo.png" 
+              alt="Sri Lanka Dunks Logo" 
+              className="h-8 w-auto object-contain"
+            />
+            <span className="text-white font-black uppercase text-base tracking-tight">
+              Sri Lanka Dunks
+            </span>
           </div>
-
-          <div>
-            <h4 className="text-white font-mono text-xs uppercase tracking-widest mb-6">Platform</h4>
-            <ul className="space-y-4 text-sm text-neutral-400">
-              <li><Link href="/training" className="hover:text-red-500 transition-colors">Training</Link></li>
-              <li><Link href="/camps" className="hover:text-red-500 transition-colors">Camps</Link></li>
-              <li><Link href="/athletes" className="hover:text-red-500 transition-colors">Athletes</Link></li>
-              <li><Link href="/leaderboard" className="hover:text-red-500 transition-colors">Leaderboard</Link></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="text-white font-mono text-xs uppercase tracking-widest mb-6">Connect</h4>
-            <ul className="space-y-4 text-sm text-neutral-400">
-              <li><Link href="/join" className="hover:text-red-500 transition-colors">Join Community</Link></li>
-              <li><Link href="/contact" className="hover:text-red-500 transition-colors">Contact</Link></li>
-              <li><Link href="/privacy" className="hover:text-red-500 transition-colors">Privacy Policy</Link></li>
-              <li><Link href="/terms" className="hover:text-red-500 transition-colors">Terms of Service</Link></li>
-            </ul>
-          </div>
-
+          <p className="text-neutral-500 max-w-sm leading-relaxed">
+            The premier high-performance athletic and vertical jump development platform for Sri Lankan athletes worldwide.
+          </p>
         </div>
 
-        <div className="border-t border-neutral-900 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-neutral-600 font-mono">
-          <p>© {new Date().getFullYear()} Sri Lanka Dunks. All rights reserved.</p>
-          <p>RISE ABOVE.</p>
+        {/* Navigation Column */}
+        <div>
+          <p className="text-white font-bold uppercase mb-4 tracking-widest">Platform</p>
+          <ul className="space-y-2">
+            <li><Link href="/training" className="hover:text-white transition-colors">Programs</Link></li>
+            <li><Link href="/camps" className="hover:text-white transition-colors">Camps & Clinics</Link></li>
+            <li><Link href="/vertical-jump-test" className="hover:text-white transition-colors">Vertical Jump Test</Link></li>
+            <li><Link href="/about" className="hover:text-white transition-colors">About Founder</Link></li>
+          </ul>
         </div>
+
+        {/* Portal Column */}
+        <div>
+          <p className="text-white font-bold uppercase mb-4 tracking-widest">Access</p>
+          <ul className="space-y-2">
+            <li><Link href="/login" className="hover:text-white transition-colors">Athlete Login</Link></li>
+            <li><Link href="/signup" className="hover:text-white transition-colors">Register Account</Link></li>
+            <li><Link href="/join" className="hover:text-white transition-colors">Join Movement</Link></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-neutral-900 flex flex-col md:flex-row justify-between items-center gap-4 text-neutral-600">
+        <p>© {new Date().getFullYear()} SRI LANKA DUNKS. ALL RIGHTS RESERVED.</p>
+        <p>BUILT FOR ELITE PERFORMANCE</p>
       </div>
     </footer>
   );

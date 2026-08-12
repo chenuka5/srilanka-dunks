@@ -13,6 +13,14 @@ export const metadata: Metadata = {
     description: 'Modern athletic performance training for the next generation of Sri Lankan athletes.',
     url: 'https://srilankadunks.com',
     siteName: 'Sri Lanka Dunks',
+    images: [
+      {
+        url: '/logo.png',
+        width: 1200,
+        height: 630,
+        alt: 'Sri Lanka Dunks Logo',
+      },
+    ],
     locale: 'en_US',
     type: 'website',
   },
@@ -20,6 +28,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Sri Lanka Dunks',
     description: 'Modern athletic performance training for the next generation of Sri Lankan athletes.',
+    images: ['/logo.png'],
   },
   robots: {
     index: true,
