@@ -2,8 +2,29 @@ import './globals.css';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Sri Lanka Dunks | Athletic Performance & Vertical Jump',
-  description: 'Modern athletic performance training for the next generation of Sri Lankan athletes.',
+  metadataBase: new URL('https://srilanka-dunks.vercel.app'),
+  title: {
+    default: 'Sri Lanka Dunks | Athletic Performance & Vertical Jump',
+    template: '%s | Sri Lanka Dunks'
+  },
+  description: 'Modern athletic performance training for the next generation of Sri Lankan athletes. Rise above with our vertical jump and strength programs.',
+  openGraph: {
+    title: 'Sri Lanka Dunks | Athletic Performance',
+    description: 'Modern athletic performance training for the next generation of Sri Lankan athletes.',
+    url: 'https://srilanka-dunks.vercel.app',
+    siteName: 'Sri Lanka Dunks',
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Sri Lanka Dunks',
+    description: 'Modern athletic performance training for the next generation of Sri Lankan athletes.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  }
 };
 
 export default function RootLayout({
