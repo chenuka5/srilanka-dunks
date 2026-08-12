@@ -7,23 +7,29 @@ import Navbar from '@/components/navbar';
 import Footer from '@/components/footer';
 import Link from 'next/link';
 
-export default function LoginPage() {
+export default function SignupPage() {
   const router = useRouter();
   const supabase = createClient();
   
+  const [firstName, setFirstName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
-    const { error: authError } = await supabase.auth.signInWithPassword({
+    const { error: authError } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          first_name: firstName,
+        },
+      }
     });
 
     if (authError) {
@@ -43,19 +49,27 @@ export default function LoginPage() {
         <div className="w-full max-w-md bg-neutral-900 border border-neutral-800 p-8 md:p-12 rounded shadow-2xl">
           
           <div className="text-center mb-10">
-            <div className="inline-block bg-red-600 text-white font-bold font-mono px-3 py-1 mb-6 text-xl tracking-wider">
-              SD
-            </div>
-            <h1 className="text-3xl font-extrabold uppercase tracking-tight mb-2">Welcome Back</h1>
-            <p className="text-neutral-400 font-mono text-xs uppercase tracking-widest">Access your athlete dashboard</p>
+            <h1 className="text-3xl font-extrabold uppercase tracking-tight mb-2">Create Profile</h1>
+            <p className="text-neutral-400 font-mono text-xs uppercase tracking-widest">Join the athlete platform</p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-6">
+          <form onSubmit={handleSignup} className="space-y-6">
             {error && (
               <div className="bg-red-950/50 border border-red-900 text-red-500 text-xs font-mono uppercase p-3 rounded text-center">
                 {error}
               </div>
             )}
+
+            <div className="space-y-2">
+              <label className="text-xs font-mono uppercase text-neutral-400">First Name</label>
+              <input 
+                type="text" 
+                required
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                className="w-full bg-black border border-neutral-800 rounded px-4 py-3 text-white focus:outline-none focus:border-red-600 transition-colors" 
+              />
+            </div>
 
             <div className="space-y-2">
               <label className="text-xs font-mono uppercase text-neutral-400">Email Address</label>
@@ -84,15 +98,15 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full bg-red-600 hover:bg-red-700 text-white font-bold font-mono uppercase tracking-widest text-sm py-4 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-4"
             >
-              {loading ? 'Authenticating...' : 'Secure Login →'}
+              {loading ? 'Creating Profile...' : 'Sign Up →'}
             </button>
           </form>
 
           <div className="mt-8 pt-8 border-t border-neutral-800 text-center">
             <p className="text-neutral-500 text-sm">
-              Don't have an account?{' '}
-              <Link href="/signup" className="text-white hover:text-red-500 transition-colors font-bold">
-                Create Profile
+              Already have an account?{' '}
+              <Link href="/login" className="text-white hover:text-red-500 transition-colors font-bold">
+                Log In
               </Link>
             </p>
           </div>
