@@ -86,4 +86,21 @@ export default function Navbar() {
       )}
     </nav>
   );
-}
+}{/* Action Button Group */}
+<div className="flex items-center gap-3">
+  {/* Existing Member Portal */}
+  <Link 
+    href="/login" 
+    className="hidden sm:inline-block border border-neutral-700 hover:border-white text-neutral-300 hover:text-white font-mono text-xs sm:text-sm uppercase tracking-widest px-4 py-2 sm:py-2.5 rounded transition-all"
+  >
+    Login
+  </Link>
+
+  {/* New Athlete Conversion */}
+  <Link 
+    href="/join" 
+    className="bg-red-600 hover:bg-red-700 text-white font-mono text-xs sm:text-sm uppercase tracking-widest px-4 sm:px-6 py-2 sm:py-2.5 rounded transition-colors font-bold shadow-md shadow-red-600/20"
+  >
+    Join Now
+  </Link>
+</div>
