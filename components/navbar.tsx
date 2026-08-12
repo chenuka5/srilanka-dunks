@@ -2,19 +2,16 @@ import Link from 'next/link';
 
 export default function Navbar() {
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-neutral-800 px-6 lg:px-12 py-4">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-neutral-800 px-6 lg:px-12 py-3">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         
-        {/* Logo Link */}
-        <Link href="/" className="flex items-center gap-3">
+        {/* Logo Link - Text removed, Logo size maximized */}
+        <Link href="/" className="flex items-center">
           <img 
             src="/logo.png" 
             alt="Sri Lanka Dunks Logo" 
-            className="h-10 w-auto object-contain"
+            className="h-16 w-auto object-contain" // Increased from h-10 to h-16
           />
-          <span className="font-extrabold uppercase tracking-tighter text-lg text-white">
-            Sri Lanka Dunks
-          </span>
         </Link>
 
         {/* Navigation Links */}
