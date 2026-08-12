@@ -1,48 +1,23 @@
-@import "tailwindcss";
-
-@theme {
-  /* Brand Colors */
-  --color-brand-black: #050505;
-  --color-brand-surface: #0F0F11;
-  --color-brand-white: #FFFFFF;
-  --color-brand-crimson: #E31B23;
-  --color-brand-gold: #D4AF37;
-  --color-brand-gray-400: #9CA3AF;
-  --color-brand-gray-800: #1F2937;
-  --color-brand-gray-900: #111827;
-
-  /* Fonts */
-  --font-heading: var(--font-oswald), sans-serif;
-  --font-body: var(--font-inter), sans-serif;
-
-  /* Letter Spacing */
-  --tracking-tighter: -0.04em;
-  --tracking-widest: 0.2em;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @layer base {
   body {
-    background-color: var(--color-brand-black);
-    color: var(--color-brand-white);
-    font-family: var(--font-body);
-    -webkit-font-smoothing: antialiased;
-  }
-  
-  ::selection {
-    background-color: var(--color-brand-crimson);
-    color: white;
-  }
-  
-  h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-heading);
-    text-transform: uppercase;
+    @apply bg-black text-white antialiased selection:bg-red-600 selection:text-white;
   }
 }
 
-@utility text-shadow-hero {
-  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+/* Custom scrollbar for a premium feel */
+::-webkit-scrollbar {
+  width: 8px;
 }
-
-html {
-  scroll-behavior: smooth;
+::-webkit-scrollbar-track {
+  background: #000; 
+}
+::-webkit-scrollbar-thumb {
+  background: #333; 
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #dc2626; 
 }
