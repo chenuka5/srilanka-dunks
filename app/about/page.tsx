@@ -25,9 +25,8 @@ export default function AboutPage() {
           {/* Black & White Founder Picture Card */}
           <div className="lg:col-span-5 border border-neutral-800 p-4 rounded bg-neutral-950">
             <div className="relative aspect-[3/4] rounded overflow-hidden bg-neutral-900 flex items-center justify-center border border-neutral-800">
-              {/* Black and White Filter applied to your future image */}
               <img 
-                src="https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=1000&auto=format&fit=crop" 
+                src="/chenuka.jpg" 
                 alt="Chenuka Kasthuriarachchi - Founder" 
                 className="w-full h-full object-cover grayscale contrast-125 hover:scale-105 transition-transform duration-500"
               />
