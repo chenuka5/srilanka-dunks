@@ -1,0 +1,6 @@
+User-Agent: *
+Allow: /
+Disallow: /dashboard/
+Disallow: /actions/
+
+Sitemap: https://srilanka-dunks.vercel.app/sitemap.xml
