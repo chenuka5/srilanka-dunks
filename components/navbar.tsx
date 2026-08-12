@@ -18,12 +18,12 @@ export default function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-md border-b border-neutral-800 px-4 sm:px-6 lg:px-12 py-2">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         
-        {/* Logo - Controlled height for mobile vs desktop */}
+        {/* Brand Logo */}
         <Link href="/" className="flex items-center">
           <img 
             src="/logo.png" 
             alt="Sri Lanka Dunks Logo" 
-            className="h-[50px] sm:h-[70px] md:h-[100px] w-auto object-contain transition-all"
+            className="h-[50px] sm:h-[70px] md:h-[90px] w-auto object-contain transition-all"
           />
         </Link>
 
@@ -40,19 +40,28 @@ export default function Navbar() {
           ))}
         </div>
 
-        {/* Action Button & Mobile Toggle */}
-        <div className="flex items-center gap-3">
+        {/* Action Button Group: Login + Join Now */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Athlete Portal Login */}
+          <Link 
+            href="/login" 
+            className="border border-neutral-700 hover:border-white text-neutral-300 hover:text-white font-mono text-xs sm:text-sm uppercase tracking-widest px-3 sm:px-4 py-2 sm:py-2.5 rounded transition-all font-semibold"
+          >
+            Login
+          </Link>
+
+          {/* Primary Conversion CTA */}
           <Link 
             href="/join" 
-            className="bg-red-600 hover:bg-red-700 text-white font-mono text-xs sm:text-sm uppercase tracking-widest px-4 sm:px-6 py-2 sm:py-3 rounded transition-colors font-bold"
+            className="bg-red-600 hover:bg-red-700 text-white font-mono text-xs sm:text-sm uppercase tracking-widest px-4 sm:px-6 py-2 sm:py-2.5 rounded transition-colors font-bold shadow-md shadow-red-600/20"
           >
             Join Now
           </Link>
 
-          {/* Hamburger Icon (Mobile Only) */}
+          {/* Mobile Menu Toggle Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-white hover:text-red-600 focus:outline-none"
+            className="md:hidden p-2 text-white hover:text-red-600 focus:outline-none ml-1"
             aria-label="Toggle Menu"
           >
             {mobileMenuOpen ? (
@@ -69,7 +78,7 @@ export default function Navbar() {
 
       </div>
 
-      {/* Mobile Slide-down Menu */}
+      {/* Mobile Slide-down Navigation */}
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-neutral-800 bg-black/95 px-6 py-6 space-y-4 font-mono text-sm uppercase tracking-wider text-neutral-300">
           {navLinks.map((link) => (
@@ -86,21 +95,4 @@ export default function Navbar() {
       )}
     </nav>
   );
-}{/* Action Button Group */}
-<div className="flex items-center gap-3">
-  {/* Existing Member Portal */}
-  <Link 
-    href="/login" 
-    className="hidden sm:inline-block border border-neutral-700 hover:border-white text-neutral-300 hover:text-white font-mono text-xs sm:text-sm uppercase tracking-widest px-4 py-2 sm:py-2.5 rounded transition-all"
-  >
-    Login
-  </Link>
-
-  {/* New Athlete Conversion */}
-  <Link 
-    href="/join" 
-    className="bg-red-600 hover:bg-red-700 text-white font-mono text-xs sm:text-sm uppercase tracking-widest px-4 sm:px-6 py-2 sm:py-2.5 rounded transition-colors font-bold shadow-md shadow-red-600/20"
-  >
-    Join Now
-  </Link>
-</div>
+}
