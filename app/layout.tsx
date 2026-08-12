@@ -2,7 +2,7 @@ import './globals.css';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://srilanka-dunks.vercel.app'),
+  metadataBase: new URL('https://srilankadunks.com'),
   title: {
     default: 'Sri Lanka Dunks | Athletic Performance & Vertical Jump',
     template: '%s | Sri Lanka Dunks'
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Sri Lanka Dunks | Athletic Performance',
     description: 'Modern athletic performance training for the next generation of Sri Lankan athletes.',
-    url: 'https://srilanka-dunks.vercel.app',
+    url: 'https://srilankadunks.com',
     siteName: 'Sri Lanka Dunks',
     locale: 'en_US',
     type: 'website',
