@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Navbar from '@/components/navbar';
 import Footer from '@/components/footer';
+import Ticker from '@/components/ticker';
 import { createClient } from '@supabase/supabase-js';
 
 // Ensure the homepage fetches fresh leaderboard data
@@ -46,9 +47,12 @@ export default async function HomePage() {
   return (
     <main className="min-h-screen flex flex-col bg-black text-white font-sans antialiased selection:bg-red-600 selection:text-white">
       <Navbar />
+      
+      {/* INJECTED TICKER HERE */}
+      <Ticker />
 
       {/* HERO SECTION */}
-      <section className="relative min-h-screen flex items-center justify-center pt-20 px-6 overflow-hidden">
+      <section className="relative min-h-screen flex items-center justify-center pt-10 pb-20 px-6 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img 
             src="https://images.unsplash.com/photo-1519861531473-9200262188bf?q=80&w=2071&auto=format&fit=crop" 
