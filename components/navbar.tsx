@@ -1,96 +1,113 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
+import { createClient } from '@supabase/supabase-js';
+import { usePathname } from 'next/navigation';
 
 export default function Navbar() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    getUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const navLinks = [
-    { name: 'About', href: '/about' },
+    { name: 'Start Here', href: '/start-here' },
     { name: 'Training', href: '/training' },
-    { name: 'Camps', href: '/camps' },
-    { name: 'Athletes', href: '/athletes' },
-    { name: 'Jump Test', href: '/vertical-jump-test' },
+    { name: 'Leaderboard', href: '/leaderboard' },
+    { name: 'Camps', href: '/camps/upcoming' },
   ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-md border-b border-neutral-800 px-4 sm:px-6 lg:px-12 py-2">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
+    <nav className="fixed w-full z-50 bg-black/90 backdrop-blur-md border-b border-neutral-900">
+      <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         
-        {/* Brand Logo */}
-        <Link href="/" className="flex items-center">
-          <img 
-            src="/logo.png" 
-            alt="Sri Lanka Dunks Logo" 
-            className="h-[50px] sm:h-[70px] md:h-[90px] w-auto object-contain transition-all"
-          />
+        {/* LOGO */}
+        <Link href="/" className="font-black text-xl md:text-2xl tracking-tighter uppercase text-white hover:scale-105 transition-transform">
+          Sri Lanka <span className="text-red-600">Dunks.</span>
         </Link>
 
-        {/* Desktop Navigation Links */}
-        <div className="hidden md:flex items-center gap-8 font-mono text-sm md:text-base font-semibold uppercase tracking-wider text-neutral-300">
+        {/* DESKTOP NAV */}
+        <div className="hidden md:flex items-center gap-8">
+          {navLinks.map((link) => {
+            const isActive = pathname === link.href;
+            return (
+              <Link 
+                key={link.name} 
+                href={link.href} 
+                className={`font-mono text-xs uppercase tracking-widest transition-colors hover:text-white ${isActive ? 'text-red-500 font-bold' : 'text-neutral-400'}`}
+              >
+                {link.name}
+              </Link>
+            );
+          })}
+          
+          {user ? (
+            <Link href="/dashboard" className="bg-red-600 hover:bg-red-700 text-white font-mono text-xs uppercase tracking-widest px-6 py-2.5 rounded font-bold transition-all shadow-lg shadow-red-600/20">
+              Portal →
+            </Link>
+          ) : (
+            <Link href="/login" className="bg-transparent border border-neutral-700 hover:border-white text-white font-mono text-xs uppercase tracking-widest px-6 py-2.5 rounded font-bold transition-all hover:bg-white hover:text-black">
+              Log In
+            </Link>
+          )}
+        </div>
+
+        {/* MOBILE HAMBURGER BUTTON */}
+        <button 
+          className="md:hidden text-white p-2" 
+          onClick={() => setIsOpen(!isOpen)}
+          aria-label="Toggle Menu"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {isOpen ? (
+              <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            ) : (
+              <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            )}
+          </svg>
+        </button>
+      </div>
+
+      {/* MOBILE MENU */}
+      {isOpen && (
+        <div className="md:hidden bg-black border-b border-neutral-900 absolute w-full left-0 top-20 flex flex-col p-6 space-y-4 shadow-2xl animate-in slide-in-from-top-2">
           {navLinks.map((link) => (
             <Link 
               key={link.name} 
               href={link.href} 
-              className="hover:text-red-600 transition-colors"
+              onClick={() => setIsOpen(false)} 
+              className="text-neutral-400 hover:text-white font-mono text-sm uppercase tracking-widest transition-colors border-b border-neutral-900 pb-4"
             >
               {link.name}
             </Link>
           ))}
-        </div>
-
-        {/* Action Button Group: Login + Join Now */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          {/* Athlete Portal Login */}
-          <Link 
-            href="/login" 
-            className="border border-neutral-700 hover:border-white text-neutral-300 hover:text-white font-mono text-xs sm:text-sm uppercase tracking-widest px-3 sm:px-4 py-2 sm:py-2.5 rounded transition-all font-semibold"
-          >
-            Login
-          </Link>
-
-          {/* Primary Conversion CTA */}
-          <Link 
-            href="/join" 
-            className="bg-red-600 hover:bg-red-700 text-white font-mono text-xs sm:text-sm uppercase tracking-widest px-4 sm:px-6 py-2 sm:py-2.5 rounded transition-colors font-bold shadow-md shadow-red-600/20"
-          >
-            Join Now
-          </Link>
-
-          {/* Mobile Menu Toggle Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-white hover:text-red-600 focus:outline-none ml-1"
-            aria-label="Toggle Menu"
-          >
-            {mobileMenuOpen ? (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            ) : (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            )}
-          </button>
-        </div>
-
-      </div>
-
-      {/* Mobile Slide-down Navigation */}
-      {mobileMenuOpen && (
-        <div className="md:hidden border-t border-neutral-800 bg-black/95 px-6 py-6 space-y-4 font-mono text-sm uppercase tracking-wider text-neutral-300">
-          {navLinks.map((link) => (
-            <Link
-              key={link.name}
-              href={link.href}
-              onClick={() => setMobileMenuOpen(false)}
-              className="block hover:text-red-600 py-2 border-b border-neutral-900"
-            >
-              {link.name}
+          {user ? (
+            <Link href="/dashboard" onClick={() => setIsOpen(false)} className="text-red-600 font-mono text-sm uppercase tracking-widest transition-colors pb-2 pt-2 font-bold">
+              Athlete Portal →
             </Link>
-          ))}
+          ) : (
+            <Link href="/login" onClick={() => setIsOpen(false)} className="text-white font-mono text-sm uppercase tracking-widest transition-colors pb-2 pt-2 font-bold">
+              Log In →
+            </Link>
+          )}
         </div>
       )}
     </nav>
