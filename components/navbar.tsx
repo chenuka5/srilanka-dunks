@@ -3,38 +3,35 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const router = useRouter();
 
-  // Initialize Supabase client
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-  const supabase = createClient(supabaseUrl, supabaseKey);
-
   useEffect(() => {
-    // Check initial user
+    // Fetch user on mount
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
     };
     getUser();
 
-    // Listen for auth changes (login/logout)
+    // Listen for real-time auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user || null);
     });
 
     return () => subscription.unsubscribe();
-  }, [supabase]);
+  }, []);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setMobileMenuOpen(false);
+    setUser(null);
     router.push('/login');
+    router.refresh();
   };
 
   const navLinks = [
@@ -71,12 +68,10 @@ export default function Navbar() {
           ))}
         </div>
 
-        {/* Action Button Group: Smart Auth Toggle */}
+        {/* Action Button Group */}
         <div className="flex items-center gap-2 sm:gap-3">
-          
           {user ? (
             <>
-              {/* Logged In State */}
               <button 
                 onClick={handleLogout}
                 className="border border-neutral-700 hover:border-white text-neutral-300 hover:text-white font-mono text-xs sm:text-sm uppercase tracking-widest px-3 sm:px-4 py-2 sm:py-2.5 rounded transition-all font-semibold"
@@ -92,7 +87,6 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              {/* Logged Out State */}
               <Link 
                 href="/login" 
                 className="border border-neutral-700 hover:border-white text-neutral-300 hover:text-white font-mono text-xs sm:text-sm uppercase tracking-widest px-3 sm:px-4 py-2 sm:py-2.5 rounded transition-all font-semibold"
@@ -108,7 +102,6 @@ export default function Navbar() {
             </>
           )}
 
-          {/* Mobile Menu Toggle Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden p-2 text-white hover:text-red-600 focus:outline-none ml-1"
@@ -128,7 +121,6 @@ export default function Navbar() {
 
       </div>
 
-      {/* Mobile Slide-down Navigation */}
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-neutral-800 bg-black/95 px-6 py-6 space-y-4 font-mono text-sm uppercase tracking-wider text-neutral-300">
           {navLinks.map((link) => (
@@ -142,7 +134,6 @@ export default function Navbar() {
             </Link>
           ))}
           
-          {/* Mobile Smart Auth Links */}
           <div className="pt-4 mt-4 border-t border-neutral-900 flex flex-col gap-4">
             {user ? (
               <>
