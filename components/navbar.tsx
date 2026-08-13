@@ -1,10 +1,41 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@supabase/supabase-js';
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const router = useRouter();
+
+  // Initialize Supabase client
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+  const supabase = createClient(supabaseUrl, supabaseKey);
+
+  useEffect(() => {
+    // Check initial user
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    getUser();
+
+    // Listen for auth changes (login/logout)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [supabase]);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setMobileMenuOpen(false);
+    router.push('/login');
+  };
 
   const navLinks = [
     { name: 'About', href: '/about' },
@@ -40,23 +71,42 @@ export default function Navbar() {
           ))}
         </div>
 
-        {/* Action Button Group: Login + Join Now */}
+        {/* Action Button Group: Smart Auth Toggle */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Athlete Portal Login */}
-          <Link 
-            href="/login" 
-            className="border border-neutral-700 hover:border-white text-neutral-300 hover:text-white font-mono text-xs sm:text-sm uppercase tracking-widest px-3 sm:px-4 py-2 sm:py-2.5 rounded transition-all font-semibold"
-          >
-            Login
-          </Link>
-
-          {/* Primary Conversion CTA */}
-          <Link 
-            href="/join" 
-            className="bg-red-600 hover:bg-red-700 text-white font-mono text-xs sm:text-sm uppercase tracking-widest px-4 sm:px-6 py-2 sm:py-2.5 rounded transition-colors font-bold shadow-md shadow-red-600/20"
-          >
-            Join Now
-          </Link>
+          
+          {user ? (
+            <>
+              {/* Logged In State */}
+              <button 
+                onClick={handleLogout}
+                className="border border-neutral-700 hover:border-white text-neutral-300 hover:text-white font-mono text-xs sm:text-sm uppercase tracking-widest px-3 sm:px-4 py-2 sm:py-2.5 rounded transition-all font-semibold"
+              >
+                Logout
+              </button>
+              <Link 
+                href="/dashboard" 
+                className="bg-red-600 hover:bg-red-700 text-white font-mono text-xs sm:text-sm uppercase tracking-widest px-4 sm:px-6 py-2 sm:py-2.5 rounded transition-colors font-bold shadow-md shadow-red-600/20"
+              >
+                Portal
+              </Link>
+            </>
+          ) : (
+            <>
+              {/* Logged Out State */}
+              <Link 
+                href="/login" 
+                className="border border-neutral-700 hover:border-white text-neutral-300 hover:text-white font-mono text-xs sm:text-sm uppercase tracking-widest px-3 sm:px-4 py-2 sm:py-2.5 rounded transition-all font-semibold"
+              >
+                Login
+              </Link>
+              <Link 
+                href="/join" 
+                className="bg-red-600 hover:bg-red-700 text-white font-mono text-xs sm:text-sm uppercase tracking-widest px-4 sm:px-6 py-2 sm:py-2.5 rounded transition-colors font-bold shadow-md shadow-red-600/20"
+              >
+                Join Now
+              </Link>
+            </>
+          )}
 
           {/* Mobile Menu Toggle Button */}
           <button
@@ -91,6 +141,44 @@ export default function Navbar() {
               {link.name}
             </Link>
           ))}
+          
+          {/* Mobile Smart Auth Links */}
+          <div className="pt-4 mt-4 border-t border-neutral-900 flex flex-col gap-4">
+            {user ? (
+              <>
+                <Link
+                  href="/dashboard"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block text-red-500 font-bold hover:text-red-400 py-2"
+                >
+                  Athlete Portal
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="text-left text-neutral-400 hover:text-white py-2"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block hover:text-white py-2"
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/join"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block text-red-500 font-bold hover:text-red-400 py-2"
+                >
+                  Join Now
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       )}
     </nav>
