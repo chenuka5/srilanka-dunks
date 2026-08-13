@@ -1,8 +1,12 @@
 import Link from 'next/link';
 import Navbar from '@/components/navbar';
 import Footer from '@/components/footer';
+import { createClient } from '@supabase/supabase-js';
 
-export default function HomePage() {
+// Ensure the homepage fetches fresh leaderboard data
+export const dynamic = 'force-dynamic';
+
+export default async function HomePage() {
   const performancePillars = [
     { title: 'Vertical Jump', desc: 'Force production, elasticity, and jump biomechanics.' },
     { title: 'Strength', desc: 'Building the lower-body foundation for explosive power.' },
@@ -18,13 +22,33 @@ export default function HomePage() {
     { year: 'Upcoming', title: 'Join The Waitlist', href: '/camps/upcoming' },
   ];
 
+  // Initialize Supabase and fetch Top 5
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+  const supabase = createClient(supabaseUrl, supabaseKey);
+
+  const { data: leaderboard } = await supabase
+    .from('vertical_jump_logs')
+    .select(`
+      running_vertical_cm,
+      standing_vertical_cm,
+      sport,
+      location,
+      profiles (*)
+    `)
+    .eq('is_verified', true)
+    .eq('show_on_leaderboard', true)
+    .order('running_vertical_cm', { ascending: false })
+    .limit(5);
+
+  const athletes = leaderboard || [];
+
   return (
     <main className="min-h-screen flex flex-col bg-black text-white font-sans antialiased selection:bg-red-600 selection:text-white">
       <Navbar />
 
       {/* HERO SECTION */}
       <section className="relative min-h-screen flex items-center justify-center pt-20 px-6 overflow-hidden">
-        {/* Cinematic Background */}
         <div className="absolute inset-0 z-0">
           <img 
             src="https://images.unsplash.com/photo-1519861531473-9200262188bf?q=80&w=2071&auto=format&fit=crop" 
@@ -119,8 +143,60 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* PLACEHOLDER: TOP 5 LEADERBOARD (Will be built in Phase 6) */}
-      <div id="homepage-leaderboard-placeholder"></div>
+      {/* TOP 5 LEADERBOARD SECTION */}
+      <section className="py-32 px-6 border-t border-neutral-900 bg-neutral-950">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-16 space-y-4">
+            <h2 className="text-sm font-mono text-red-600 uppercase tracking-widest font-bold">Top Athletes</h2>
+            <h3 className="text-4xl md:text-6xl font-black uppercase tracking-tight text-white">Leaderboard</h3>
+          </div>
+          
+          {athletes.length === 0 ? (
+            <div className="text-center py-12 border border-neutral-800 rounded bg-black">
+              <h4 className="text-xl font-bold uppercase tracking-tight text-white mb-2">The leaderboard is just getting started.</h4>
+              <p className="text-neutral-400 font-mono text-xs uppercase tracking-widest mb-6">Be the first to make your mark.</p>
+              <Link href="/vertical-jump-test" className="text-red-600 hover:text-white font-mono text-xs uppercase tracking-widest font-bold transition-colors">
+                Test Your Vertical →
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {athletes.map((athlete, index) => {
+                const rawProfile = athlete.profiles as any;
+                const profile = Array.isArray(rawProfile) ? rawProfile[0] : rawProfile || {};
+                
+                const name = profile.first_name ? `${profile.first_name} ${profile.last_name || ''}` : profile.full_name || 'Anonymous Athlete';
+                const jump = athlete.running_vertical_cm || athlete.standing_vertical_cm || 0;
+                const rank = index + 1;
+                const isRank1 = rank === 1;
+
+                return (
+                  <div key={index} className={`flex items-center justify-between p-4 sm:p-6 rounded border transition-all ${isRank1 ? 'bg-black border-yellow-500' : 'bg-neutral-900 border-neutral-800'}`}>
+                    <div className="flex items-center gap-4 sm:gap-6">
+                      <span className={`text-2xl sm:text-3xl font-black ${isRank1 ? 'text-yellow-500' : 'text-neutral-600'}`}>0{rank}</span>
+                      <div>
+                        <h4 className="text-base sm:text-lg font-bold uppercase tracking-tight text-white">{name}</h4>
+                        <p className="text-neutral-500 font-mono text-[10px] uppercase tracking-widest hidden sm:block">{athlete.sport || 'Unknown Sport'}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <span className={`text-2xl sm:text-3xl font-black uppercase ${isRank1 ? 'text-yellow-500' : 'text-white'}`}>
+                        {jump} <span className="text-sm sm:text-base text-neutral-500">CM</span>
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          <div className="text-center mt-12">
+            <Link href="/leaderboard" className="inline-block bg-transparent border border-neutral-700 hover:border-white text-white font-mono text-xs uppercase tracking-widest px-8 py-4 rounded font-bold transition-all hover:bg-white hover:text-black">
+              View Full Leaderboard →
+            </Link>
+          </div>
+        </div>
+      </section>
 
       {/* THE PHILOSOPHY SECTION */}
       <section className="py-32 px-6 border-t border-neutral-900 bg-red-600 text-center">
@@ -151,7 +227,6 @@ export default function HomePage() {
             {camps.map((camp, idx) => (
               <Link key={idx} href={camp.href} className="group block border border-neutral-800 rounded bg-neutral-950 overflow-hidden hover:border-red-600 transition-colors">
                 <div className="h-48 bg-neutral-900 relative">
-                  {/* Placeholder for Cloudinary Images */}
                   <div className="absolute inset-0 flex items-center justify-center text-neutral-800 font-mono text-xs uppercase tracking-widest">
                     Media Placeholder
                   </div>
