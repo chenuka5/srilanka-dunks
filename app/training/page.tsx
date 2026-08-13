@@ -34,6 +34,7 @@ export default function TrainingPage() {
     <main className="min-h-screen flex flex-col bg-black text-white font-sans antialiased selection:bg-red-600 selection:text-white">
       <Navbar />
 
+      {/* HERO SECTION */}
       <section className="pt-40 pb-20 px-6 border-b border-neutral-900 text-center">
         <div className="max-w-4xl mx-auto space-y-6">
           <p className="text-red-600 font-mono text-xs uppercase tracking-widest font-bold">
@@ -52,7 +53,7 @@ export default function TrainingPage() {
       <section className="py-24 px-6 bg-neutral-950 flex-grow">
         <div className="max-w-5xl mx-auto space-y-24">
           
-          {/* The Pillars Grid */}
+          {/* THE PILLARS GRID */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {pillars.map((pillar, index) => (
               <div key={index} className="bg-black border border-neutral-800 p-8 rounded hover:border-red-600 transition-colors group">
@@ -83,8 +84,35 @@ export default function TrainingPage() {
             ))}
           </div>
 
-          {/* CTA Section */}
-          <div className="text-center pt-12 border-t border-neutral-900 space-y-8">
+          {/* WHO IS IT FOR SECTION */}
+          <div className="pt-24 border-t border-neutral-900">
+            <div className="text-center mb-16 space-y-4">
+              <h2 className="text-sm font-mono text-red-600 uppercase tracking-widest font-bold">The Target</h2>
+              <h3 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-white">Who is this for?</h3>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="bg-black border border-neutral-800 p-8 rounded hover:bg-neutral-900 transition-colors">
+                <h4 className="text-xl font-bold uppercase tracking-tight text-white mb-2">Court Athletes</h4>
+                <p className="text-neutral-400 font-mono text-sm leading-relaxed">Basketball and volleyball players looking to play above the rim, increase their block radius, and dominate the airspace.</p>
+              </div>
+              <div className="bg-black border border-neutral-800 p-8 rounded hover:bg-neutral-900 transition-colors">
+                <h4 className="text-xl font-bold uppercase tracking-tight text-white mb-2">Field Athletes</h4>
+                <p className="text-neutral-400 font-mono text-sm leading-relaxed">Rugby and football players needing explosive first-step acceleration, higher top-end speed, and raw power for contact.</p>
+              </div>
+              <div className="bg-black border border-neutral-800 p-8 rounded hover:bg-neutral-900 transition-colors">
+                <h4 className="text-xl font-bold uppercase tracking-tight text-white mb-2">Track & Field</h4>
+                <p className="text-neutral-400 font-mono text-sm leading-relaxed">High jumpers, long jumpers, and sprinters seeking to optimize their force application and stretch-shortening cycle.</p>
+              </div>
+              <div className="bg-black border border-neutral-800 p-8 rounded hover:bg-neutral-900 transition-colors">
+                <h4 className="text-xl font-bold uppercase tracking-tight text-white mb-2">Everyday Competitors</h4>
+                <p className="text-neutral-400 font-mono text-sm leading-relaxed">Anyone tired of feeling heavy on their feet. If your goal is to build structural resilience and effortless bounce, this is for you.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* CTA SECTION */}
+          <div className="text-center pt-24 border-t border-neutral-900 space-y-8">
             <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-white">
               Ready to execute?
             </h2>
