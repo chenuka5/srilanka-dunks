@@ -70,8 +70,10 @@ export default async function LeaderboardPage() {
             /* RANKING STATE */
             <div className="space-y-4">
               {athletes.map((athlete, index) => {
-                const profile = athlete.profiles || {};
-                // Fallback gracefully depending on what columns exist in their profiles table
+                // FIX: Safely cast and extract the profile whether it's an array or object
+                const rawProfile = athlete.profiles as any;
+                const profile = Array.isArray(rawProfile) ? rawProfile[0] : rawProfile || {};
+                
                 const name = profile.first_name 
                   ? `${profile.first_name} ${profile.last_name || ''}` 
                   : profile.full_name || 'Anonymous Athlete';
@@ -137,4 +139,4 @@ export default async function LeaderboardPage() {
       <Footer />
     </main>
   );
-} 
+}
