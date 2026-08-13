@@ -1,132 +1,248 @@
-import { createServerSupabaseClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { createClient, User } from '@supabase/supabase-js';
+import Navbar from '@/components/navbar';
+import Footer from '@/components/footer';
 import Link from 'next/link';
-import JumpLogger from '@/components/jump-logger';
 
-export const dynamic = 'force-dynamic';
-
-export default async function DashboardPage() {
-  const supabase = await createServerSupabaseClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/login');
-  }
-
-  const { data: logs, error } = await supabase
-    .from('vertical_jump_logs')
-    .select('*')
-    .eq('profile_id', user.id)
-    .order('date_recorded', { ascending: false });
-
-  if (error) {
-    console.error('Error fetching logs:', error.message);
-  }
-
-  const totalLogs = logs?.length || 0;
-  let maxVerticalScoreCm = 0;
-  
-  if (logs && logs.length > 0) {
-    logs.forEach((log) => {
-      const standing = log.standing_vertical_cm || 0;
-      const running = log.running_vertical_cm || 0;
-      const score = running - standing;
-      
-      if (score > maxVerticalScoreCm) {
-        maxVerticalScoreCm = score;
+// Mock Data for the 4-Week Starter Program
+const starterProgram = [
+  {
+    week: 1,
+    title: 'Force Accumulation',
+    days: [
+      {
+        day: 1,
+        title: 'Max Strength (Lower)',
+        exercises: [
+          { name: 'Barbell Back Squat', sets: 4, reps: '5', notes: '80% 1RM. 3s controlled eccentric.' },
+          { name: 'Romanian Deadlift', sets: 3, reps: '8', notes: 'Focus on maximum hamstring stretch.' },
+          { name: 'Bulgarian Split Squat', sets: 3, reps: '6/leg', notes: 'Heavy dumbbell in goblet hold.' },
+          { name: 'Weighted Plank', sets: 3, reps: '45 sec', notes: 'Maintain rigid core.' }
+        ]
+      },
+      {
+        day: 2,
+        title: 'Plyometrics & Elasticity',
+        exercises: [
+          { name: 'Extensive Pogo Hops', sets: 4, reps: '15 sec', notes: 'Stiff ankles, minimal ground contact time.' },
+          { name: 'Depth Drops', sets: 4, reps: '4', notes: '18-inch box. Stick the landing perfectly.' },
+          { name: 'Max Approach Jumps', sets: 5, reps: '2', notes: 'Full intent. Rest 2 mins between sets.' }
+        ]
       }
-    });
+    ]
+  },
+  {
+    week: 2,
+    title: 'Rate of Force Development',
+    days: [
+      {
+        day: 1,
+        title: 'Dynamic Effort',
+        exercises: [
+          { name: 'Box Jumps', sets: 4, reps: '3', notes: 'Focus on hip extension speed.' },
+          { name: 'Trap Bar Jumps', sets: 4, reps: '4', notes: '20% 1RM. Max velocity.' },
+          { name: 'Nordic Hamstring Curls', sets: 3, reps: '5', notes: 'Control the descent as long as possible.' }
+        ]
+      }
+    ]
   }
+];
+
+export default function WorkoutsPage() {
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   
-  const maxVerticalScoreInches = maxVerticalScoreCm > 0 
-    ? (maxVerticalScoreCm / 2.54).toFixed(1) 
-    : '0.0';
-    
-  const firstName = user.user_metadata?.first_name || 'ATHLETE';
+  // UI State for Navigation
+  const [activeWeek, setActiveWeek] = useState(1);
+  const [activeDay, setActiveDay] = useState(1);
+  
+  // Local state to simulate checking off completed exercises
+  const [completedExercises, setCompletedExercises] = useState<Record<string, boolean>>({});
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+  const supabase = createClient(supabaseUrl, supabaseKey);
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
+        router.push('/login');
+        return;
+      }
+      setUser(user);
+      setIsLoading(false);
+    };
+    checkUser();
+  }, [router, supabase]);
+
+  const toggleExercise = (exerciseId: string) => {
+    setCompletedExercises(prev => ({
+      ...prev,
+      [exerciseId]: !prev[exerciseId]
+    }));
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-red-600 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  // Find the data for the currently selected week and day
+  const currentWeekData = starterProgram.find(w => w.week === activeWeek) || starterProgram[0];
+  const currentDayData = currentWeekData.days.find(d => d.day === activeDay) || currentWeekData.days[0];
 
   return (
-    <div className="min-h-screen bg-black text-white p-6 md:p-12">
-      <div className="max-w-6xl mx-auto space-y-8">
-        
-        {/* Header */}
-        <div className="flex justify-between items-center border-b border-neutral-800 pb-6">
+    <main className="min-h-screen flex flex-col bg-black text-white font-sans antialiased">
+      <Navbar />
+
+      {/* DASHBOARD HEADER */}
+      <section className="pt-32 pb-8 px-6 border-b border-neutral-900 bg-neutral-950">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div>
-            <p className="text-red-600 font-mono text-xs uppercase tracking-widest">Member Platform</p>
-            <h1 className="text-3xl md:text-5xl font-extrabold uppercase tracking-tight">
-              Welcome, {firstName}
+            <div className="flex items-center gap-4 mb-2">
+              <Link href="/dashboard" className="text-neutral-500 hover:text-white transition-colors font-mono text-xs uppercase tracking-widest">
+                ← Back to Portal
+              </Link>
+              <span className="text-red-600 font-mono text-[10px] uppercase tracking-widest border border-red-600/30 bg-red-900/10 px-2 py-1 rounded">
+                Active Program
+              </span>
+            </div>
+            <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-white">
+              4-Week Jump <span className="text-neutral-500">Starter.</span>
             </h1>
           </div>
-          <form action="/actions/auth/signout" method="POST">
-            <button type="submit" className="border border-neutral-700 hover:border-white px-4 py-2 text-sm font-mono uppercase tracking-wider transition">
-              Sign Out
-            </button>
-          </form>
         </div>
+      </section>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-neutral-900 border border-neutral-800 p-6 rounded">
-            <p className="text-xs text-neutral-400 font-mono uppercase">Max Vertical Score</p>
-            <p className="text-4xl font-extrabold mt-2">{maxVerticalScoreInches} <span className="text-sm font-normal text-neutral-500">INCHES</span></p>
-          </div>
-
-          <div className="bg-neutral-900 border border-neutral-800 p-6 rounded">
-            <p className="text-xs text-neutral-400 font-mono uppercase">Active Program</p>
-            <p className="text-xl font-bold text-yellow-500 mt-2">4-WEEK FOUNDATION</p>
-            <Link href="/dashboard/workouts" className="inline-block mt-4 text-xs font-mono uppercase text-neutral-300 hover:text-white border-b border-neutral-700">
-              View Workouts →
-            </Link>
-          </div>
-
-          <div className="bg-neutral-900 border border-neutral-800 p-6 rounded">
-            <p className="text-xs text-neutral-400 font-mono uppercase">Total Logs</p>
-            <p className="text-4xl font-extrabold mt-2">{totalLogs}</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Log Jump Form */}
-          <JumpLogger userId={user.id} />
-
-          {/* Jump History Feed */}
-          <div className="bg-neutral-900 border border-neutral-800 p-6 rounded space-y-4">
-            <h2 className="text-lg font-bold font-mono uppercase">Jump History</h2>
-            
-            {logs && logs.length > 0 ? (
-              <div className="overflow-y-auto max-h-[300px] pr-2 custom-scrollbar">
-                <table className="w-full text-left text-sm">
-                  <thead className="border-b border-neutral-800 font-mono text-neutral-400 sticky top-0 bg-neutral-900">
-                    <tr>
-                      <th className="pb-3 pr-4 font-normal">Date</th>
-                      <th className="pb-3 pr-4 font-normal">Stand</th>
-                      <th className="pb-3 pr-4 font-normal">Run</th>
-                      <th className="pb-3 text-red-500 font-normal">Score</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {logs.map((log) => {
-                      const score = (log.running_vertical_cm || 0) - (log.standing_vertical_cm || 0);
-                      return (
-                        <tr key={log.id} className="border-b border-neutral-800/50 hover:bg-neutral-800/30 transition-colors">
-                          <td className="py-3 pr-4 text-neutral-300">
-                            {new Date(log.date_recorded).toLocaleDateString()}
-                          </td>
-                          <td className="py-3 pr-4">{log.standing_vertical_cm}</td>
-                          <td className="py-3 pr-4">{log.running_vertical_cm}</td>
-                          <td className="py-3 font-bold text-red-500">+{score}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+      <section className="py-12 px-6 flex-grow bg-black">
+        <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-12">
+          
+          {/* SIDEBAR: NAVIGATION */}
+          <div className="w-full lg:w-1/4 space-y-8">
+            {starterProgram.map((week) => (
+              <div key={week.week} className="space-y-3">
+                <h3 className="font-mono text-xs uppercase tracking-widest text-neutral-500 font-bold border-b border-neutral-900 pb-2">
+                  Week {week.week} // {week.title}
+                </h3>
+                <div className="flex flex-col gap-2">
+                  {week.days.map((day) => {
+                    const isActive = activeWeek === week.week && activeDay === day.day;
+                    return (
+                      <button
+                        key={day.day}
+                        onClick={() => {
+                          setActiveWeek(week.week);
+                          setActiveDay(day.day);
+                        }}
+                        className={`text-left font-mono text-xs uppercase tracking-widest p-4 rounded transition-all ${
+                          isActive 
+                            ? 'bg-red-600 text-white font-bold' 
+                            : 'bg-neutral-950 text-neutral-400 border border-neutral-900 hover:border-neutral-700 hover:text-white'
+                        }`}
+                      >
+                        Day {day.day}: {day.title}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            ) : (
-              <p className="text-sm text-neutral-500 font-mono">No jumps logged yet.</p>
-            )}
+            ))}
           </div>
-        </div>
 
-      </div>
-    </div>
+          {/* MAIN CONTENT: EXERCISE LIST */}
+          <div className="w-full lg:w-3/4">
+            <div className="bg-neutral-950 border border-neutral-900 rounded p-6 md:p-10">
+              
+              <div className="mb-10 pb-6 border-b border-neutral-800">
+                <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tight text-white">
+                  Week {activeWeek} — Day {activeDay}
+                </h2>
+                <p className="text-neutral-400 font-mono text-sm mt-2 uppercase tracking-widest">
+                  Focus: {currentDayData.title}
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                {/* Headers (Desktop only) */}
+                <div className="hidden md:grid grid-cols-12 gap-4 font-mono text-xs uppercase tracking-widest text-neutral-500 pb-2 border-b border-neutral-900">
+                  <div className="col-span-1 text-center">Status</div>
+                  <div className="col-span-5">Movement</div>
+                  <div className="col-span-2 text-center">Sets</div>
+                  <div className="col-span-2 text-center">Reps</div>
+                  <div className="col-span-2 text-right">Notes</div>
+                </div>
+
+                {/* Exercises */}
+                {currentDayData.exercises.map((exercise, index) => {
+                  const exerciseId = `w${activeWeek}-d${activeDay}-e${index}`;
+                  const isCompleted = completedExercises[exerciseId];
+
+                  return (
+                    <div 
+                      key={index} 
+                      className={`grid grid-cols-1 md:grid-cols-12 gap-4 items-center p-4 rounded border transition-all cursor-pointer ${
+                        isCompleted 
+                          ? 'bg-green-900/10 border-green-900/50 opacity-50 grayscale' 
+                          : 'bg-black border-neutral-800 hover:border-red-600/50'
+                      }`}
+                      onClick={() => toggleExercise(exerciseId)}
+                    >
+                      {/* Mobile Checkbox / Desktop Status */}
+                      <div className="col-span-1 flex items-center justify-between md:justify-center">
+                        <span className="md:hidden font-mono text-xs uppercase tracking-widest text-neutral-500">Status</span>
+                        <div className={`w-6 h-6 rounded flex items-center justify-center border transition-colors ${
+                          isCompleted ? 'bg-green-500 border-green-500 text-black' : 'bg-neutral-900 border-neutral-700 text-transparent'
+                        }`}>
+                          ✓
+                        </div>
+                      </div>
+
+                      {/* Movement Name */}
+                      <div className="col-span-5">
+                        <h4 className={`font-bold uppercase tracking-tight ${isCompleted ? 'text-neutral-400 line-through' : 'text-white'}`}>
+                          {exercise.name}
+                        </h4>
+                      </div>
+
+                      {/* Sets */}
+                      <div className="col-span-2 flex justify-between md:justify-center items-center">
+                        <span className="md:hidden font-mono text-[10px] uppercase tracking-widest text-neutral-500">Sets</span>
+                        <span className="font-black text-xl text-neutral-300">{exercise.sets}</span>
+                      </div>
+
+                      {/* Reps */}
+                      <div className="col-span-2 flex justify-between md:justify-center items-center">
+                        <span className="md:hidden font-mono text-[10px] uppercase tracking-widest text-neutral-500">Reps</span>
+                        <span className="font-mono text-sm uppercase text-red-500 font-bold">{exercise.reps}</span>
+                      </div>
+
+                      {/* Notes */}
+                      <div className="col-span-2 mt-2 md:mt-0 pt-2 md:pt-0 border-t md:border-t-0 border-neutral-900 text-left md:text-right">
+                        <span className="md:hidden font-mono text-[10px] uppercase tracking-widest text-neutral-500 block mb-1">Coach Notes</span>
+                        <p className="font-mono text-[10px] uppercase tracking-widest text-neutral-500 leading-relaxed">
+                          {exercise.notes}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <Footer />
+    </main>
   );
 }
