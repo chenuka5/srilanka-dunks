@@ -46,12 +46,17 @@ export default function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-md border-b border-neutral-800 px-4 sm:px-6 lg:px-12 py-2">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         
-        {/* Brand Logo */}
-        <Link href="/" className="flex items-center">
+        {/* Brand Logo Link */}
+        <Link 
+          href="/" 
+          className="flex items-center cursor-pointer select-none"
+          onClick={() => setMobileMenuOpen(false)}
+        >
           <img 
             src="/logo.png" 
             alt="Sri Lanka Dunks Logo" 
-            className="h-[50px] sm:h-[70px] md:h-[90px] w-auto object-contain transition-all"
+            draggable={false}
+            className="h-[50px] sm:h-[70px] md:h-[90px] w-auto object-contain transition-all pointer-events-none"
           />
         </Link>
 
@@ -121,6 +126,7 @@ export default function Navbar() {
 
       </div>
 
+      {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-neutral-800 bg-black/95 px-6 py-6 space-y-4 font-mono text-sm uppercase tracking-wider text-neutral-300">
           {navLinks.map((link) => (
