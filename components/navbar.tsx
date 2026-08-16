@@ -11,14 +11,12 @@ export default function Navbar() {
   const router = useRouter();
 
   useEffect(() => {
-    // Fetch user on mount
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
     };
     getUser();
 
-    // Listen for real-time auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user || null);
     });
@@ -34,6 +32,12 @@ export default function Navbar() {
     router.refresh();
   };
 
+  const handleLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setMobileMenuOpen(false);
+    router.push('/');
+  };
+
   const navLinks = [
     { name: 'About', href: '/about' },
     { name: 'Training', href: '/training' },
@@ -46,19 +50,19 @@ export default function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-md border-b border-neutral-800 px-4 sm:px-6 lg:px-12 py-2">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         
-        {/* Brand Logo Link */}
-        <Link 
+        {/* Guaranteed Clickable Brand Logo */}
+        <a 
           href="/" 
-          className="flex items-center cursor-pointer select-none"
-          onClick={() => setMobileMenuOpen(false)}
+          onClick={handleLogoClick}
+          className="flex items-center cursor-pointer select-none py-1"
         >
           <img 
             src="/logo.png" 
             alt="Sri Lanka Dunks Logo" 
             draggable={false}
-            className="h-[50px] sm:h-[70px] md:h-[90px] w-auto object-contain transition-all pointer-events-none"
+            className="h-[50px] sm:h-[70px] md:h-[90px] w-auto object-contain pointer-events-none"
           />
-        </Link>
+        </a>
 
         {/* Desktop Navigation Links */}
         <div className="hidden md:flex items-center gap-8 font-mono text-sm md:text-base font-semibold uppercase tracking-wider text-neutral-300">

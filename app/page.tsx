@@ -70,8 +70,8 @@ export default function HomePage() {
       <section className="relative min-h-screen flex items-center justify-center pt-10 pb-20 px-6 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img 
-            src="https://images.unsplash.com/photo-1519861531473-9200262188bf?q=80&w=2071&auto=format&fit=crop" 
-            alt="Athletic Performance" 
+            src="/hero-bg.jpg" 
+            alt="Sri Lanka Dunks Performance" 
             className="w-full h-full object-cover object-top opacity-40 filter grayscale contrast-125"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-black z-10" />
