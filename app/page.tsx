@@ -1,13 +1,16 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/navbar';
 import Footer from '@/components/footer';
 import Ticker from '@/components/ticker';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 
-// Ensure the homepage fetches fresh leaderboard data
-export const dynamic = 'force-dynamic';
+export default function HomePage() {
+  const [athletes, setAthletes] = useState<any[]>([]);
+  const [user, setUser] = useState<any>(null);
 
-export default async function HomePage() {
   const performancePillars = [
     { title: 'Vertical Jump', desc: 'Force production, elasticity, and jump biomechanics.' },
     { title: 'Strength', desc: 'Building the lower-body foundation for explosive power.' },
@@ -23,32 +26,44 @@ export default async function HomePage() {
     { year: 'Upcoming', title: 'Join The Waitlist', href: '/camps/upcoming' },
   ];
 
-  // Initialize Supabase and fetch Top 5
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-  const supabase = createClient(supabaseUrl, supabaseKey);
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      // 1. Get current authenticated user
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
 
-  const { data: leaderboard } = await supabase
-    .from('vertical_jump_logs')
-    .select(`
-      running_vertical_cm,
-      standing_vertical_cm,
-      sport,
-      location,
-      profiles (*)
-    `)
-    .eq('is_verified', true)
-    .eq('show_on_leaderboard', true)
-    .order('running_vertical_cm', { ascending: false })
-    .limit(5);
+      // 2. Fetch Top 5 Leaderboard
+      const { data: leaderboard } = await supabase
+        .from('vertical_jump_logs')
+        .select(`
+          running_vertical_cm,
+          standing_vertical_cm,
+          sport,
+          location,
+          profiles (*)
+        `)
+        .eq('is_verified', true)
+        .eq('show_on_leaderboard', true)
+        .order('running_vertical_cm', { ascending: false })
+        .limit(5);
 
-  const athletes = leaderboard || [];
+      if (leaderboard) setAthletes(leaderboard);
+    };
+
+    fetchInitialData();
+
+    // 3. Listen for login/logout events in real-time
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   return (
     <main className="min-h-screen flex flex-col bg-black text-white font-sans antialiased selection:bg-red-600 selection:text-white">
       <Navbar />
       
-      {/* INJECTED TICKER HERE */}
       <Ticker />
 
       {/* HERO SECTION */}
@@ -72,22 +87,62 @@ export default async function HomePage() {
             Modern athletic performance training for the next generation of Sri Lankan athletes.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
-            <Link 
-              href="/vertical-jump-test" 
-              className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-mono text-xs md:text-sm uppercase tracking-widest px-8 py-4 rounded transition-all font-bold shadow-lg shadow-red-600/20 hover:scale-105"
-            >
-              Take The Vertical Jump Test →
-            </Link>
-            <Link 
-              href="/join" 
-              className="w-full sm:w-auto bg-transparent border border-neutral-700 hover:border-white text-white font-mono text-xs md:text-sm uppercase tracking-widest px-8 py-4 rounded transition-all font-bold hover:bg-white hover:text-black"
-            >
-              Join The Movement →
-            </Link>
-          </div>
+          {!user && (
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
+              <Link 
+                href="/vertical-jump-test" 
+                className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-mono text-xs md:text-sm uppercase tracking-widest px-8 py-4 rounded transition-all font-bold shadow-lg shadow-red-600/20 hover:scale-105"
+              >
+                Take The Vertical Jump Test →
+              </Link>
+              <Link 
+                href="/join" 
+                className="w-full sm:w-auto bg-transparent border border-neutral-700 hover:border-white text-white font-mono text-xs md:text-sm uppercase tracking-widest px-8 py-4 rounded transition-all font-bold hover:bg-white hover:text-black"
+              >
+                Join The Movement →
+              </Link>
+            </div>
+          )}
         </div>
       </section>
+
+      {/* --- SMART DASHBOARD INJECTION (ONLY VISIBLE IF LOGGED IN) --- */}
+      {user && (
+        <section className="py-12 px-6 border-t border-neutral-900 bg-neutral-950 relative z-30">
+          <div className="max-w-5xl mx-auto">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+              <h2 className="text-sm font-mono text-neutral-400 uppercase tracking-widest">
+                Athlete Access Active // <span className="text-white">{user.email}</span>
+              </h2>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Training Quick Launch */}
+              <div className="bg-black border border-neutral-800 p-8 rounded group hover:border-red-600 transition-colors">
+                <span className="text-red-600 font-mono text-[10px] uppercase tracking-widest border border-red-600/30 bg-red-900/10 px-2 py-1 rounded inline-block mb-4">Current Protocol</span>
+                <h3 className="text-2xl font-black uppercase tracking-tight text-white mb-2">4-Week Jump Starter</h3>
+                <p className="text-neutral-500 font-mono text-xs mb-8">Pick up exactly where you left off. Access your daily movements, sets, and reps.</p>
+                <Link href="/dashboard/workouts" className="inline-block bg-red-600 hover:bg-red-700 text-white font-mono text-xs uppercase tracking-widest px-6 py-3 rounded font-bold shadow-lg shadow-red-600/20 transition-all group-hover:scale-105">
+                  Resume Training →
+                </Link>
+              </div>
+
+              {/* Data & Metrics Quick Launch */}
+              <div className="bg-black border border-neutral-800 p-8 rounded group hover:border-white transition-colors">
+                 <span className="text-neutral-400 font-mono text-[10px] uppercase tracking-widest border border-neutral-700 bg-neutral-900 px-2 py-1 rounded inline-block mb-4">Data Hub</span>
+                <h3 className="text-2xl font-black uppercase tracking-tight text-white mb-2">Metrics & Logs</h3>
+                <p className="text-neutral-500 font-mono text-xs mb-8">Submit a new vertical jump score or review your personal athletic history.</p>
+                <div className="flex gap-4">
+                  <Link href="/dashboard" className="inline-block bg-white hover:bg-neutral-200 text-black font-mono text-xs uppercase tracking-widest px-6 py-3 rounded font-bold transition-all group-hover:scale-105">
+                    Log A Jump →
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* MISSION SECTION */}
       <section className="py-32 px-6 border-t border-neutral-900 bg-black">
