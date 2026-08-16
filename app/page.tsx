@@ -72,9 +72,9 @@ export default function HomePage() {
           <img 
             src="/hero-bg.jpg" 
             alt="Sri Lanka Dunks Performance" 
-            className="w-full h-full object-cover object-top opacity-40 filter grayscale contrast-125"
+            className="w-full h-full object-cover object-bottom opacity-90 filter contrast-110 brightness-110"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-black z-10" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-black/85 z-10" />
         </div>
 
         <div className="relative z-20 max-w-5xl mx-auto text-center space-y-8 mt-12">
