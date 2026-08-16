@@ -2,13 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
-  const router = useRouter();
 
   useEffect(() => {
     const getUser = async () => {
@@ -28,14 +26,7 @@ export default function Navbar() {
     await supabase.auth.signOut();
     setMobileMenuOpen(false);
     setUser(null);
-    router.push('/login');
-    router.refresh();
-  };
-
-  const handleLogoClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setMobileMenuOpen(false);
-    router.push('/');
+    window.location.href = '/login';
   };
 
   const navLinks = [
@@ -47,18 +38,18 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-md border-b border-neutral-800 px-4 sm:px-6 lg:px-12 py-2">
+    <nav className="fixed top-0 left-0 right-0 z-[100] bg-black/90 backdrop-blur-md border-b border-neutral-800 px-4 sm:px-6 lg:px-12 py-2">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         
-        {/* Guaranteed Clickable Brand Logo */}
+        {/* Unbreakable Home Link */}
         <a 
           href="/" 
-          onClick={handleLogoClick}
-          className="flex items-center cursor-pointer select-none py-1"
+          className="relative z-[110] flex items-center cursor-pointer select-none p-1 hover:opacity-80 transition-opacity"
+          aria-label="Sri Lanka Dunks Home"
         >
           <img 
             src="/logo.png" 
-            alt="Sri Lanka Dunks Logo" 
+            alt="Sri Lanka Dunks" 
             draggable={false}
             className="h-[50px] sm:h-[70px] md:h-[90px] w-auto object-contain pointer-events-none"
           />
