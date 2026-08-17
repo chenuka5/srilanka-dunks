@@ -70,7 +70,7 @@ export default function HomePage() {
       <section className="relative min-h-screen flex items-center justify-center pt-10 pb-20 px-6 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img 
-            src="/hero-bg.jpg" 
+            src="/hero-bg-.jpg" 
             alt="Sri Lanka Dunks Performance" 
             className="w-full h-full object-cover object-top opacity-55 filter grayscale contrast-125 brightness-105"
           />
