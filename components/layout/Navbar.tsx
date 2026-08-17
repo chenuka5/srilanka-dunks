@@ -8,25 +8,29 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
+  // Active production-ready links
   const links = [
     { name: 'Training', href: '/training' },
-    { name: 'Camps', href: '/camps' },
-    { name: 'Athletes', href: '/athletes' },
     { name: 'About', href: '/about' },
+    { name: 'Leaderboard', href: '/leaderboard' },
+    { name: 'Jump Test', href: '/vertical-jump-test' },
+    // { name: 'Camps', href: '/camps' },
+    // { name: 'Athletes', href: '/athletes' },
   ];
 
   return (
     <nav className="fixed w-full z-50 bg-brand-black/95 backdrop-blur-sm border-b border-brand-gray-900 h-20">
       <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
         
-        <Link href="/" className="flex items-center gap-2">
+        {/* Unbreakable Home Link using native <a> tag */}
+        <a href="/" className="flex items-center gap-2 cursor-pointer select-none">
           <div className="w-8 h-8 bg-brand-crimson rounded-sm flex items-center justify-center font-heading font-bold text-white leading-none">
             SD
           </div>
           <span className="font-heading font-bold text-xl tracking-widest uppercase text-white">
             Sri Lanka Dunks
           </span>
-        </Link>
+        </a>
 
         <div className="hidden md:flex items-center gap-8">
           {links.map((link) => (
@@ -54,6 +58,7 @@ export default function Navbar() {
         <button 
           className="md:hidden text-white p-2"
           onClick={() => setIsOpen(!isOpen)}
+          aria-label="Toggle Menu"
         >
           <div className="w-6 h-0.5 bg-white mb-1.5"></div>
           <div className="w-6 h-0.5 bg-white mb-1.5"></div>
@@ -74,8 +79,8 @@ export default function Navbar() {
             </Link>
           ))}
           <div className="h-px bg-brand-gray-800 w-full my-2"></div>
-          <Link href="/login" className="text-lg font-heading tracking-widest uppercase text-brand-gray-400">Login</Link>
-          <Link href="/join" className="text-lg font-heading tracking-widest uppercase text-brand-crimson">Join Platform</Link>
+          <Link href="/login" onClick={() => setIsOpen(false)} className="text-lg font-heading tracking-widest uppercase text-brand-gray-400">Login</Link>
+          <Link href="/join" onClick={() => setIsOpen(false)} className="text-lg font-heading tracking-widest uppercase text-brand-crimson">Join Platform</Link>
         </div>
       )}
     </nav>
