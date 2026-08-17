@@ -4,21 +4,24 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   metadataBase: new URL('https://srilankadunks.com'),
   title: {
-    default: 'Sri Lanka Dunks | Athletic Performance & Vertical Jump',
+    default: 'Sri Lanka Dunks | Athletic Performance Training',
     template: '%s | Sri Lanka Dunks'
   },
-  description: 'Modern athletic performance training for the next generation of Sri Lankan athletes. Rise above with our vertical jump and strength programs.',
+  description: 'Sri Lanka Dunks helps Sri Lankan athletes jump higher, move better and become stronger through modern athletic performance training, vertical jump development, strength, power and plyometrics.',
+  alternates: {
+    canonical: '/',
+  },
   openGraph: {
-    title: 'Sri Lanka Dunks | Athletic Performance',
-    description: 'Modern athletic performance training for the next generation of Sri Lankan athletes.',
+    title: 'Sri Lanka Dunks | Rise Above.',
+    description: 'Athletic performance for Sri Lankan athletes. Take the vertical jump test, view the leaderboard, and access world-class training.',
     url: 'https://srilankadunks.com',
     siteName: 'Sri Lanka Dunks',
     images: [
       {
-        url: '/logo.png',
+        url: '/hero-bg-.jpg',
         width: 1200,
         height: 630,
-        alt: 'Sri Lanka Dunks Logo',
+        alt: 'Sri Lanka Dunks - Rise Above.',
       },
     ],
     locale: 'en_US',
@@ -26,14 +29,17 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Sri Lanka Dunks',
-    description: 'Modern athletic performance training for the next generation of Sri Lankan athletes.',
-    images: ['/logo.png'],
+    title: 'Sri Lanka Dunks | Rise Above.',
+    description: 'Athletic performance for Sri Lankan athletes. Take the vertical jump test, view the leaderboard, and access world-class training.',
+    images: ['/hero-bg-.jpg'],
   },
   robots: {
     index: true,
     follow: true,
-  }
+  },
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({
