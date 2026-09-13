@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Navbar from '@/components/layout/Navbar'; // Corrected import to the fixed layout Navbar
 import Footer from '@/components/footer';
 import Ticker from '@/components/ticker';
 import { supabase } from '@/lib/supabase';
@@ -27,11 +28,9 @@ export default function HomePage() {
 
   useEffect(() => {
     const fetchInitialData = async () => {
-      // 1. Get current authenticated user
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
 
-      // 2. Fetch Top 5 Leaderboard
       const { data: leaderboard } = await supabase
         .from('vertical_jump_logs')
         .select(`
@@ -51,7 +50,6 @@ export default function HomePage() {
 
     fetchInitialData();
 
-    // 3. Listen for login/logout events in real-time
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user || null);
     });
@@ -61,6 +59,9 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen flex flex-col bg-black text-white font-sans antialiased selection:bg-red-600 selection:text-white">
+      
+      {/* Re-added the Navbar right here */}
+      <Navbar />
       
       <Ticker />
 
@@ -104,7 +105,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* --- SMART DASHBOARD INJECTION (ONLY VISIBLE IF LOGGED IN) --- */}
+      {/* --- SMART DASHBOARD INJECTION --- */}
       {user && (
         <section className="py-12 px-6 border-t border-neutral-900 bg-neutral-950 relative z-30">
           <div className="max-w-5xl mx-auto">
@@ -116,7 +117,6 @@ export default function HomePage() {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Training Quick Launch */}
               <div className="bg-black border border-neutral-800 p-8 rounded group hover:border-red-600 transition-colors">
                 <span className="text-red-600 font-mono text-[10px] uppercase tracking-widest border border-red-600/30 bg-red-900/10 px-2 py-1 rounded inline-block mb-4">Current Protocol</span>
                 <h3 className="text-2xl font-black uppercase tracking-tight text-white mb-2">4-Week Jump Starter</h3>
@@ -126,7 +126,6 @@ export default function HomePage() {
                 </Link>
               </div>
 
-              {/* Data & Metrics Quick Launch */}
               <div className="bg-black border border-neutral-800 p-8 rounded group hover:border-white transition-colors">
                  <span className="text-neutral-400 font-mono text-[10px] uppercase tracking-widest border border-neutral-700 bg-neutral-900 px-2 py-1 rounded inline-block mb-4">Data Hub</span>
                 <h3 className="text-2xl font-black uppercase tracking-tight text-white mb-2">Metrics & Logs</h3>
