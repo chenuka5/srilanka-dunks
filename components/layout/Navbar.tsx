@@ -19,15 +19,16 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="fixed w-full z-50 bg-brand-black/95 backdrop-blur-sm border-b border-brand-gray-900 h-20">
+    <nav className="fixed w-full z-[9999] bg-brand-black/95 backdrop-blur-sm border-b border-brand-gray-900 h-20">
+      {/* Boosted z-index to pierce through hero/ticker elements */}
       <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
         
-        {/* Unbreakable Home Link using native <a> tag */}
-        <a href="/" className="flex items-center gap-2 cursor-pointer select-none">
-          <div className="w-8 h-8 bg-brand-crimson rounded-sm flex items-center justify-center font-heading font-bold text-white leading-none">
+        {/* Unbreakable Home Link with restricted max width to prevent overlap */}
+        <a href="/" className="flex items-center gap-2 cursor-pointer select-none relative z-[10000] max-w-[70%]">
+          <div className="w-8 h-8 flex-shrink-0 bg-brand-crimson rounded-sm flex items-center justify-center font-heading font-bold text-white leading-none">
             SD
           </div>
-          <span className="font-heading font-bold text-xl tracking-widest uppercase text-white">
+          <span className="font-heading font-bold text-lg sm:text-xl tracking-widest uppercase text-white truncate">
             Sri Lanka Dunks
           </span>
         </a>
@@ -55,19 +56,21 @@ export default function Navbar() {
           </Link>
         </div>
 
+        {/* Protected Hamburger Button pinned to the right */}
         <button 
-          className="md:hidden text-white p-2"
+          className="md:hidden relative z-[10000] p-3 -mr-3 text-white cursor-pointer active:scale-95 transition-transform flex-shrink-0 ml-auto"
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Toggle Menu"
         >
-          <div className="w-6 h-0.5 bg-white mb-1.5"></div>
-          <div className="w-6 h-0.5 bg-white mb-1.5"></div>
-          <div className="w-6 h-0.5 bg-white"></div>
+          <div className={`w-6 h-0.5 bg-white transition-all duration-300 ${isOpen ? 'rotate-45 translate-y-2' : 'mb-1.5'}`}></div>
+          <div className={`w-6 h-0.5 bg-white transition-all duration-300 ${isOpen ? 'opacity-0' : 'mb-1.5'}`}></div>
+          <div className={`w-6 h-0.5 bg-white transition-all duration-300 ${isOpen ? '-rotate-45 -translate-y-2' : ''}`}></div>
         </button>
       </div>
 
+      {/* Dropdown menu given its own high z-index */}
       {isOpen && (
-        <div className="md:hidden absolute top-20 left-0 w-full bg-brand-surface border-b border-brand-gray-900 flex flex-col p-6 gap-6 shadow-2xl">
+        <div className="md:hidden absolute top-20 left-0 w-full bg-brand-surface border-b border-brand-gray-900 flex flex-col p-6 gap-6 shadow-2xl z-[9990]">
           {links.map((link) => (
             <Link 
               key={link.name} 
