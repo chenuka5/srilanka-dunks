@@ -8,32 +8,29 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
-  // Active production-ready links
   const links = [
     { name: 'Training', href: '/training' },
     { name: 'About', href: '/about' },
     { name: 'Leaderboard', href: '/leaderboard' },
     { name: 'Jump Test', href: '/vertical-jump-test' },
-    // { name: 'Camps', href: '/camps' },
-    // { name: 'Athletes', href: '/athletes' },
   ];
 
   return (
-    <nav className="fixed w-full z-[9999] bg-brand-black/95 backdrop-blur-sm border-b border-brand-gray-900 h-20">
-      {/* Boosted z-index to pierce through hero/ticker elements */}
-      <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
+    <nav className="fixed top-0 left-0 w-full z-[99999] bg-brand-black/95 border-b border-brand-gray-900 h-20">
+      <div className="max-w-7xl mx-auto px-6 h-full flex items-center relative">
         
-        {/* Unbreakable Home Link with restricted max width to prevent overlap */}
-        <a href="/" className="flex items-center gap-2 cursor-pointer select-none relative z-[10000] max-w-[70%]">
+        {/* Logo - Pinned Left */}
+        <a href="/" className="flex items-center gap-2 cursor-pointer select-none relative z-[100000]">
           <div className="w-8 h-8 flex-shrink-0 bg-brand-crimson rounded-sm flex items-center justify-center font-heading font-bold text-white leading-none">
             SD
           </div>
-          <span className="font-heading font-bold text-lg sm:text-xl tracking-widest uppercase text-white truncate">
+          <span className="font-heading font-bold text-lg sm:text-xl tracking-widest uppercase text-white">
             Sri Lanka Dunks
           </span>
         </a>
 
-        <div className="hidden md:flex items-center gap-8">
+        {/* Desktop Links - Hidden on Mobile */}
+        <div className="hidden md:flex items-center gap-8 ml-auto mr-8">
           {links.map((link) => (
             <Link 
               key={link.name} 
@@ -56,34 +53,35 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* Protected Hamburger Button pinned to the right */}
+        {/* Mobile Button - Ripped out of flex flow, absolute pinned to right side, massive tap target */}
         <button 
-          className="md:hidden relative z-[10000] p-3 -mr-3 text-white cursor-pointer active:scale-95 transition-transform flex-shrink-0 ml-auto"
+          className="md:hidden absolute right-2 top-1/2 -translate-y-1/2 z-[100000] p-4 text-white cursor-pointer touch-manipulation pointer-events-auto"
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Toggle Menu"
+          style={{ WebkitTapHighlightColor: 'transparent' }}
         >
-          <div className={`w-6 h-0.5 bg-white transition-all duration-300 ${isOpen ? 'rotate-45 translate-y-2' : 'mb-1.5'}`}></div>
-          <div className={`w-6 h-0.5 bg-white transition-all duration-300 ${isOpen ? 'opacity-0' : 'mb-1.5'}`}></div>
-          <div className={`w-6 h-0.5 bg-white transition-all duration-300 ${isOpen ? '-rotate-45 -translate-y-2' : ''}`}></div>
+          <div className={`w-7 h-0.5 bg-white transition-all duration-300 ${isOpen ? 'rotate-45 translate-y-2' : 'mb-1.5'}`}></div>
+          <div className={`w-7 h-0.5 bg-white transition-all duration-300 ${isOpen ? 'opacity-0' : 'mb-1.5'}`}></div>
+          <div className={`w-7 h-0.5 bg-white transition-all duration-300 ${isOpen ? '-rotate-45 -translate-y-2' : ''}`}></div>
         </button>
       </div>
 
-      {/* Dropdown menu given its own high z-index */}
+      {/* Mobile Menu Dropdown */}
       {isOpen && (
-        <div className="md:hidden absolute top-20 left-0 w-full bg-brand-surface border-b border-brand-gray-900 flex flex-col p-6 gap-6 shadow-2xl z-[9990]">
+        <div className="md:hidden absolute top-20 left-0 w-full bg-brand-surface border-b border-brand-gray-900 flex flex-col p-6 gap-6 shadow-2xl z-[99990]">
           {links.map((link) => (
             <Link 
               key={link.name} 
               href={link.href}
               onClick={() => setIsOpen(false)}
-              className="text-lg font-heading tracking-widest uppercase text-white"
+              className="text-lg font-heading tracking-widest uppercase text-white py-2"
             >
               {link.name}
             </Link>
           ))}
           <div className="h-px bg-brand-gray-800 w-full my-2"></div>
-          <Link href="/login" onClick={() => setIsOpen(false)} className="text-lg font-heading tracking-widest uppercase text-brand-gray-400">Login</Link>
-          <Link href="/join" onClick={() => setIsOpen(false)} className="text-lg font-heading tracking-widest uppercase text-brand-crimson">Join Platform</Link>
+          <Link href="/login" onClick={() => setIsOpen(false)} className="text-lg font-heading tracking-widest uppercase text-brand-gray-400 py-2">Login</Link>
+          <Link href="/join" onClick={() => setIsOpen(false)} className="text-lg font-heading tracking-widest uppercase text-brand-crimson py-2">Join Platform</Link>
         </div>
       )}
     </nav>
