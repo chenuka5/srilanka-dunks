@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Navbar from '@/components/navbar';
 import Footer from '@/components/footer';
 import Ticker from '@/components/ticker';
 import { supabase } from '@/lib/supabase';
@@ -62,7 +61,6 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen flex flex-col bg-black text-white font-sans antialiased selection:bg-red-600 selection:text-white">
-      <Navbar />
       
       <Ticker />
 
