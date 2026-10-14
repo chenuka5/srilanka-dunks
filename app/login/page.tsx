@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -17,11 +18,15 @@ export default function LoginPage() {
   // Check if session already exists
   useEffect(() => {
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
       if (session) {
         router.push('/dashboard');
       }
     };
+
     checkSession();
   }, [router]);
 
@@ -31,13 +36,17 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const { data, error: authError } =
+        await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
 
       if (authError) {
-        setError(authError.message || 'Invalid email or password. Please try again.');
+        setError(
+          authError.message ||
+            'Invalid email or password. Please try again.'
+        );
         setIsLoading(false);
         return;
       }
@@ -47,7 +56,9 @@ export default function LoginPage() {
         router.refresh();
       }
     } catch (err: any) {
-      setError('An unexpected network error occurred. Please try again.');
+      setError(
+        'An unexpected network error occurred. Please try again.'
+      );
       setIsLoading(false);
     }
   };
@@ -62,12 +73,16 @@ export default function LoginPage() {
             <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tight text-white">
               Welcome <span className="text-red-600">Back.</span>
             </h1>
+
             <p className="text-neutral-400 font-mono text-xs uppercase tracking-widest">
               Athlete Portal Login
             </p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-6 bg-neutral-950 p-8 rounded border border-neutral-900 shadow-2xl">
+          <form
+            onSubmit={handleLogin}
+            className="space-y-6 bg-neutral-950 p-8 rounded border border-neutral-900 shadow-2xl"
+          >
             {error && (
               <div className="p-4 bg-red-900/20 border border-red-600 text-red-500 font-mono text-xs uppercase tracking-widest rounded text-center">
                 {error}
@@ -75,29 +90,35 @@ export default function LoginPage() {
             )}
 
             <div>
-              <label className="block text-xs font-mono uppercase tracking-widest text-neutral-400 mb-2">Email Address</label>
-              <input 
-                required 
-                type="email" 
-                value={email} 
-                onChange={(e) => setEmail(e.target.value)} 
-                className="w-full bg-black border border-neutral-800 focus:border-red-600 rounded p-3 text-white font-mono text-sm outline-none transition-all" 
+              <label className="block text-xs font-mono uppercase tracking-widest text-neutral-400 mb-2">
+                Email Address
+              </label>
+
+              <input
+                required
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full bg-black border border-neutral-800 focus:border-red-600 rounded p-3 text-white font-mono text-sm outline-none transition-all"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-mono uppercase tracking-widest text-neutral-400 mb-2">Password</label>
-              <input 
-                required 
-                type="password" 
-                value={password} 
-                onChange={(e) => setPassword(e.target.value)} 
-                className="w-full bg-black border border-neutral-800 focus:border-red-600 rounded p-3 text-white font-mono text-sm outline-none transition-all" 
+              <label className="block text-xs font-mono uppercase tracking-widest text-neutral-400 mb-2">
+                Password
+              </label>
+
+              <input
+                required
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-black border border-neutral-800 focus:border-red-600 rounded p-3 text-white font-mono text-sm outline-none transition-all"
               />
             </div>
 
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={isLoading}
               className="w-full mt-4 bg-red-600 hover:bg-red-700 disabled:bg-neutral-800 disabled:text-neutral-500 text-white font-mono text-sm uppercase tracking-widest p-4 rounded font-bold transition-all shadow-lg shadow-red-600/20"
             >
@@ -107,7 +128,13 @@ export default function LoginPage() {
 
           <div className="text-center">
             <p className="text-neutral-500 font-mono text-xs uppercase tracking-widest">
-              Don't have an account? <Link href="/signup" className="text-white hover:text-red-600 underline underline-offset-4 ml-1 transition-colors">Sign Up</Link>
+              Don't have an account?{' '}
+              <Link
+                href="/join"
+                className="text-white hover:text-red-600 underline underline-offset-4 ml-1 transition-colors"
+              >
+                Sign Up
+              </Link>
             </p>
           </div>
         </div>

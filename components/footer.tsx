@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 
 export default function Footer() {
@@ -38,7 +39,7 @@ export default function Footer() {
           <p className="text-white font-bold uppercase mb-4 tracking-widest">Access</p>
           <ul className="space-y-2">
             <li><Link href="/login" className="hover:text-white transition-colors">Athlete Login</Link></li>
-            <li><Link href="/signup" className="hover:text-white transition-colors">Register Account</Link></li>
+            <li><Link href="/join" className="hover:text-white transition-colors">Register Account</Link></li>
             <li><Link href="/join" className="hover:text-white transition-colors">Join Movement</Link></li>
           </ul>
         </div>

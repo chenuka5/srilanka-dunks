@@ -1,6 +1,17 @@
+
+import type { Metadata } from 'next';
 import Navbar from '@/components/navbar';
 import Footer from '@/components/footer';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'About Us | Our Story and Coaching',
+  description:
+    'Discover the story behind Sri Lanka Dunks, our founder’s athletic journey, and our mission to develop Sri Lankan athletes through modern performance training.',
+  alternates: {
+    canonical: 'https://srilankadunks.com/about',
+  },
+};
 
 export default function AboutPage() {
   const highlights = [
@@ -16,7 +27,6 @@ export default function AboutPage() {
     <main className="min-h-screen flex flex-col bg-black text-white font-sans antialiased selection:bg-red-600 selection:text-white">
       <Navbar />
 
-      {/* HERO SECTION */}
       <section className="pt-40 pb-16 px-6 border-b border-neutral-900 bg-neutral-950">
         <div className="max-w-5xl mx-auto text-center space-y-6">
           <p className="text-red-600 font-mono text-xs uppercase tracking-widest font-bold">
@@ -32,16 +42,13 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* FOUNDER SPOTLIGHT & ACHIEVEMENTS GRID */}
       <section className="py-24 px-6 bg-black border-b border-neutral-900">
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-          
-          {/* Image & Quick Badge Column */}
           <div className="lg:col-span-5 space-y-6">
             <div className="relative group overflow-hidden rounded border border-neutral-800 hover:border-red-600 transition-colors">
-              <img 
-                src="/chenuka.jpg" 
-                alt="Chenuka - Founder of Sri Lanka Dunks" 
+              <img
+                src="/chenuka.jpg"
+                alt="Chenuka - Founder of Sri Lanka Dunks"
                 className="w-full aspect-[4/5] object-cover filter grayscale contrast-125 group-hover:grayscale-0 transition-all duration-700"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
@@ -62,7 +69,6 @@ export default function AboutPage() {
             </div>
           </div>
 
-          {/* Profile & Key Highlights Column */}
           <div className="lg:col-span-7 space-y-10">
             <div>
               <p className="text-red-600 font-mono text-xs uppercase tracking-widest font-bold mb-2">
@@ -79,7 +85,6 @@ export default function AboutPage() {
               </p>
             </div>
 
-            {/* Career Highlights Grid */}
             <div className="pt-6 border-t border-neutral-900">
               <h4 className="text-xs font-mono text-white uppercase tracking-widest font-bold mb-6">
                 Proven Track Record & Credentials
@@ -98,11 +103,9 @@ export default function AboutPage() {
               </div>
             </div>
           </div>
-
         </div>
       </section>
 
-      {/* FULL CHRONOLOGICAL NARRATIVE */}
       <section className="py-24 px-6 bg-neutral-950 border-b border-neutral-900">
         <div className="max-w-4xl mx-auto space-y-16">
           <div className="text-center space-y-2">
@@ -112,7 +115,6 @@ export default function AboutPage() {
             </h2>
           </div>
 
-          {/* Chapter 1 */}
           <div className="space-y-4 border-l-2 border-neutral-800 pl-6 relative">
             <div className="w-3 h-3 rounded-full bg-red-600 absolute -left-[7px] top-1.5" />
             <span className="text-neutral-500 font-mono text-xs uppercase tracking-widest">2012 – 2019</span>
@@ -127,7 +129,6 @@ export default function AboutPage() {
             </p>
           </div>
 
-          {/* Chapter 2 */}
           <div className="space-y-4 border-l-2 border-neutral-800 pl-6 relative">
             <div className="w-3 h-3 rounded-full bg-red-600 absolute -left-[7px] top-1.5" />
             <span className="text-neutral-500 font-mono text-xs uppercase tracking-widest">2020 – 2023</span>
@@ -142,7 +143,6 @@ export default function AboutPage() {
             </p>
           </div>
 
-          {/* Chapter 3 */}
           <div className="space-y-4 border-l-2 border-neutral-800 pl-6 relative">
             <div className="w-3 h-3 rounded-full bg-red-600 absolute -left-[7px] top-1.5" />
             <span className="text-neutral-500 font-mono text-xs uppercase tracking-widest">2024 & Beyond</span>
@@ -156,11 +156,9 @@ export default function AboutPage() {
               Today, Sri Lanka Dunks is evolving into a full online ecosystem and in-person academy dedicated to empowering Sri Lankan athletes worldwide to jump higher, move faster, and build resilient athletic bodies.
             </p>
           </div>
-
         </div>
       </section>
 
-      {/* FINAL CALL TO ACTION */}
       <section className="py-24 px-6 bg-black text-center">
         <div className="max-w-3xl mx-auto space-y-8">
           <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tight text-white">
@@ -170,14 +168,14 @@ export default function AboutPage() {
             Join the movement, test your vertical, or access elite training programming today.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            <Link 
-              href="/join" 
+            <Link
+              href="/join"
               className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-mono text-xs uppercase tracking-widest px-8 py-4 rounded font-bold transition-all shadow-lg shadow-red-600/20 hover:scale-105"
             >
               Join The Movement →
             </Link>
-            <Link 
-              href="/vertical-jump-test" 
+            <Link
+              href="/vertical-jump-test"
               className="w-full sm:w-auto bg-transparent border border-neutral-700 hover:border-white text-white font-mono text-xs uppercase tracking-widest px-8 py-4 rounded font-bold hover:bg-white hover:text-black transition-all"
             >
               Take Jump Test →

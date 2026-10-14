@@ -1,3 +1,4 @@
+
 import './globals.css';
 import type { Metadata } from 'next';
 
@@ -5,15 +6,14 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://srilankadunks.com'),
   title: {
     default: 'Sri Lanka Dunks | Athletic Performance Training',
-    template: '%s | Sri Lanka Dunks'
+    template: '%s | Sri Lanka Dunks',
   },
-  description: 'Sri Lanka Dunks helps Sri Lankan athletes jump higher, move better and become stronger through modern athletic performance training, vertical jump development, strength, power and plyometrics.',
-  alternates: {
-    canonical: '/',
-  },
+  description:
+    'Sri Lanka Dunks helps Sri Lankan athletes jump higher, move better and become stronger through modern athletic performance training, vertical jump development, strength, power and plyometrics.',
   openGraph: {
     title: 'Sri Lanka Dunks | Rise Above.',
-    description: 'Athletic performance for Sri Lankan athletes. Take the vertical jump test, view the leaderboard, and access world-class training.',
+    description:
+      'Athletic performance for Sri Lankan athletes. Take the vertical jump test, view the leaderboard, and access world-class training.',
     url: 'https://srilankadunks.com',
     siteName: 'Sri Lanka Dunks',
     images: [
@@ -30,7 +30,8 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Sri Lanka Dunks | Rise Above.',
-    description: 'Athletic performance for Sri Lankan athletes. Take the vertical jump test, view the leaderboard, and access world-class training.',
+    description:
+      'Athletic performance for Sri Lankan athletes. Take the vertical jump test, view the leaderboard, and access world-class training.',
     images: ['/hero-bg-.jpg'],
   },
   robots: {
