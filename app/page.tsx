@@ -64,7 +64,7 @@ export default function HomePage() {
     <main className="min-h-screen flex flex-col bg-black text-white font-sans antialiased selection:bg-red-600 selection:text-white">
       <Navbar />
       
-      <Ticker />
+      {/*<Ticker />*/}
 
       {/* HERO SECTION */}
       <section className="relative min-h-screen flex items-center justify-center pt-10 pb-20 px-6 overflow-hidden">
