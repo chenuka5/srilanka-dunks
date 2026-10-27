@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -31,33 +30,24 @@ export default function Ticker() {
   const renderContent = () => {
     if (athletes.length === 0) {
       return (
-        <span className="flex items-center whitespace-nowrap px-2">
-          SRI LANKA DUNKS <span className="mx-4">•</span>
-          HOW HIGH CAN YOU GO? <span className="mx-4">•</span>
-          <Link
-            href="/vertical-jump-test"
-            className="pointer-events-auto hover:text-white underline decoration-black/30 underline-offset-4 transition-colors"
-          >
+        <span className="inline-flex h-full items-center whitespace-nowrap px-2">
+          SRI LANKA DUNKS <span className="mx-3">•</span>
+          HOW HIGH CAN YOU GO? <span className="mx-3">•</span>
+          <Link href="/vertical-jump-test" className="hover:text-white underline underline-offset-4">
             TAKE THE VERTICAL JUMP TEST
           </Link>
-          <span className="mx-4">•</span>
-          <Link
-            href="/join"
-            className="pointer-events-auto hover:text-white underline decoration-black/30 underline-offset-4 transition-colors"
-          >
+          <span className="mx-3">•</span>
+          <Link href="/join" className="hover:text-white underline underline-offset-4">
             JOIN THE MOVEMENT
           </Link>
-          <span className="mx-4">•</span>
+          <span className="mx-3">•</span>
         </span>
       );
     }
 
     return (
-      <span className="flex items-center whitespace-nowrap px-2">
-        <Link
-          href="/leaderboard"
-          className="pointer-events-auto hover:text-white transition-colors flex items-center"
-        >
+      <span className="inline-flex h-full items-center whitespace-nowrap px-2">
+        <Link href="/leaderboard" className="inline-flex items-center hover:text-white">
           {athletes.map((athlete, index) => {
             const rawProfile = athlete.profiles as any;
             const profile = Array.isArray(rawProfile)
@@ -73,75 +63,73 @@ export default function Ticker() {
               athlete.standing_vertical_cm ||
               0;
 
-            const rank = index + 1;
-
             return (
-              <span key={index} className="flex items-center">
-                {rank === 1 && <span className="mr-2">🏆</span>}
+              <span key={index} className="inline-flex items-center">
+                {index === 0 && <span className="mr-2">🏆</span>}
                 <span className="font-bold">
-                  #{rank} {name.toUpperCase()} — {jump} CM
+                  #{index + 1} {name.toUpperCase()} — {jump} CM
                 </span>
-                <span className="mx-4">•</span>
+                <span className="mx-3">•</span>
               </span>
             );
           })}
         </Link>
 
-        <Link
-          href="/vertical-jump-test"
-          className="pointer-events-auto hover:text-white underline decoration-black/30 underline-offset-4 transition-colors"
-        >
+        <Link href="/vertical-jump-test" className="hover:text-white underline underline-offset-4">
           HOW HIGH CAN YOU GO?
         </Link>
-
-        <span className="mx-4">•</span>
+        <span className="mx-3">•</span>
       </span>
     );
   };
 
-  const repeatingBlocks = Array(4)
-    .fill(0)
-    .map((_, i) => (
-      <div key={i} className="flex items-center">
-        {renderContent()}
-      </div>
-    ));
+  const repeatingBlocks = Array(4).fill(0).map((_, index) => (
+    <div key={index} className="flex h-full shrink-0 items-center">
+      {renderContent()}
+    </div>
+  ));
 
   return (
-    <div className="relative mt-0 w-full bg-red-600 text-black font-mono text-xs sm:text-sm uppercase tracking-widest overflow-hidden py-2.5 border-b border-red-700 z-40 pointer-events-none">
+    <div className="relative z-40 h-7 w-full overflow-hidden border-b border-red-700 bg-red-600 font-mono text-[10px] leading-none uppercase tracking-wider text-black sm:text-xs">
       <style>{`
         @keyframes ticker-scroll {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
         }
+
         .animate-ticker {
-          display: flex;
-          width: max-content;
-          animation: ticker-scroll 35s linear infinite;
+  display: flex;
+  align-items: center;
+  width: max-content;
+  height: 100%;
+  animation: ticker-scroll 35s linear infinite;
+}
         }
+
         .animate-ticker:hover {
           animation-play-state: paused;
         }
+
         @media (prefers-reduced-motion: reduce) {
           .animate-ticker {
             animation: none;
             width: 100%;
             justify-content: center;
-            flex-wrap: wrap;
           }
+
           .ticker-duplicate {
             display: none;
           }
         }
       `}</style>
 
-      <div className="animate-ticker">
-        <div className="flex items-center">
+      <div className="animate-ticker flex items-center">
+        <div className="flex h-full items-center">
           {repeatingBlocks}
         </div>
 
         <div
-          className="flex items-center ticker-duplicate"
+          className="ticker-duplicate flex h-full items-center"
           aria-hidden="true"
         >
           {repeatingBlocks}

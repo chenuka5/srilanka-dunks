@@ -61,10 +61,12 @@ export default function HomePage() {
   }, []);
 
   return (
-    <main className="min-h-screen flex flex-col bg-black text-white font-sans antialiased selection:bg-red-600 selection:text-white">
-      <Navbar />
-      
-      {/*<Ticker />*/}
+<main className="min-h-screen flex flex-col bg-black text-white font-sans antialiased selection:bg-red-600 selection:text-white">
+  <Navbar />
+
+  <div className="mt-[70px] sm:mt-[90px] md:mt-[110px]">
+    <Ticker />
+  </div>
 
       {/* HERO SECTION */}
       <section className="relative min-h-screen flex items-center justify-center pt-10 pb-20 px-6 overflow-hidden">
