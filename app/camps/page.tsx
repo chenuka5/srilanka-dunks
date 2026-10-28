@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -13,7 +14,6 @@ export default function CampsPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Step 3: Updated handleSubmit function connected to Supabase API endpoint
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -38,51 +38,80 @@ export default function CampsPage() {
     }
   };
 
+  const pastCamps = [
+    {
+      year: '2025',
+      title: 'The Next Level',
+      description:
+        'The second Sri Lanka Dunks Vertical Jump Camp brought athletes together to develop explosive power, improve jumping ability and pursue higher performance.',
+      photos: [
+        '/camps/2025/camp-1.jpg',
+        '/camps/2025/camp-2.jpg',
+        '/camps/2025/camp-3.jpg',
+        '/camps/2025/camp-4.jpg',
+        '/camps/2025/camp-5.jpg',
+      ],
+    },
+    {
+      year: '2024',
+      title: 'The Beginning',
+      description:
+        'The first Sri Lanka Dunks Vertical Jump Camp marked the beginning of the mission to help Sri Lankan athletes improve their vertical jump and athletic performance.',
+      photos: [
+        '/camps/2024/camp-1.jpg',
+        '/camps/2024/camp-2.jpg',
+        '/camps/2024/camp-3.jpg',
+      ],
+    },
+  ];
+
   return (
     <main className="min-h-screen flex flex-col bg-black text-white font-sans antialiased">
       <Navbar />
 
+      {/* 2026 WEBINAR */}
       <section className="pt-36 pb-24 px-6 lg:px-12 max-w-5xl mx-auto w-full text-center flex-grow flex flex-col justify-center items-center">
-        
-        {/* Status Badge */}
         <div className="inline-flex items-center gap-2 bg-red-600/10 border border-red-600/30 px-4 py-1.5 rounded-full mb-6">
-          <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
+          <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
           <span className="text-red-500 font-mono text-xs uppercase tracking-widest font-bold">
             2026 Special Update
           </span>
         </div>
 
-        {/* Heading */}
         <h1 className="text-4xl md:text-7xl font-black uppercase tracking-tight">
           2026 Free Online Webinar
         </h1>
 
-        {/* Subtitle / Notice */}
         <p className="mt-6 text-neutral-300 font-mono text-xs md:text-sm max-w-2xl leading-relaxed">
-          Due to unavoidable circumstances, all physical in-person camps are suspended for this year. Instead, we are hosting an exclusive, <span className="text-red-500 font-bold">100% FREE 2026 Live Online Webinar</span> covering complete vertical jump biomechanics, strength programming, and explosive performance training.
+          Due to unavoidable circumstances, all physical in-person camps are
+          suspended for this year. Instead, we are hosting an exclusive,{' '}
+          <span className="text-red-500 font-bold">
+            100% FREE 2026 Live Online Webinar
+          </span>{' '}
+          covering complete vertical jump biomechanics, strength programming,
+          and explosive performance training.
         </p>
 
-        {/* Webinar Details Card */}
         <div className="mt-10 w-full max-w-xl border border-neutral-800 bg-neutral-950 p-8 rounded-xl text-left space-y-4">
-          <div className="flex justify-between items-center border-b border-neutral-900 pb-3 font-mono text-xs">
+          <div className="flex justify-between items-center border-b border-neutral-900 pb-3 font-mono text-xs gap-4">
             <span className="text-neutral-500 uppercase tracking-widest">Format</span>
-            <span className="text-white font-bold uppercase">Live Interactive Webinar</span>
+            <span className="text-white font-bold uppercase text-right">Live Interactive Webinar</span>
           </div>
-          <div className="flex justify-between items-center border-b border-neutral-900 pb-3 font-mono text-xs">
+          <div className="flex justify-between items-center border-b border-neutral-900 pb-3 font-mono text-xs gap-4">
             <span className="text-neutral-500 uppercase tracking-widest">Year</span>
             <span className="text-white font-bold">2026 Season</span>
           </div>
-          <div className="flex justify-between items-center border-b border-neutral-900 pb-3 font-mono text-xs">
+          <div className="flex justify-between items-center border-b border-neutral-900 pb-3 font-mono text-xs gap-4">
             <span className="text-neutral-500 uppercase tracking-widest">Cost</span>
-            <span className="text-red-500 font-bold uppercase">Free (100% Subsidized)</span>
+            <span className="text-red-500 font-bold uppercase text-right">Free (100% Subsidized)</span>
           </div>
-          <div className="flex justify-between items-center font-mono text-xs">
+          <div className="flex justify-between items-center font-mono text-xs gap-4">
             <span className="text-neutral-500 uppercase tracking-widest">Access</span>
-            <span className="text-white font-bold uppercase">Registration Waitlist Only</span>
+            <span className="text-white font-bold uppercase text-right">Registration Waitlist Only</span>
           </div>
         </div>
 
-        {/* Interactive Registration Form */}
+        {/* EXISTING REGISTRATION FORM */}
         <div className="mt-12 w-full max-w-xl border border-red-600/30 bg-neutral-950 p-8 rounded-xl text-left shadow-2xl">
           {!isSubmitted ? (
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -95,7 +124,6 @@ export default function CampsPage() {
                 </p>
               </div>
 
-              {/* Full Name Input */}
               <div>
                 <label className="block text-neutral-300 font-mono text-xs uppercase tracking-wider mb-2">
                   Full Name <span className="text-red-500">*</span>
@@ -110,7 +138,6 @@ export default function CampsPage() {
                 />
               </div>
 
-              {/* Email Input */}
               <div>
                 <label className="block text-neutral-300 font-mono text-xs uppercase tracking-wider mb-2">
                   Email Address <span className="text-red-500">*</span>
@@ -125,7 +152,6 @@ export default function CampsPage() {
                 />
               </div>
 
-              {/* WhatsApp Phone Number Input */}
               <div>
                 <label className="block text-neutral-300 font-mono text-xs uppercase tracking-wider mb-2">
                   WhatsApp Phone Number <span className="text-red-500">*</span>
@@ -140,7 +166,6 @@ export default function CampsPage() {
                 />
               </div>
 
-              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={loading}
@@ -150,7 +175,6 @@ export default function CampsPage() {
               </button>
             </form>
           ) : (
-            /* Confirmation State */
             <div className="text-center py-8 space-y-4">
               <div className="w-12 h-12 bg-red-600/20 text-red-500 rounded-full flex items-center justify-center mx-auto border border-red-600/40">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -161,12 +185,68 @@ export default function CampsPage() {
                 You're On The Waitlist!
               </h3>
               <p className="text-neutral-400 font-mono text-xs leading-relaxed max-w-md mx-auto">
-                Thank you, <span className="text-white font-bold">{formData.fullName}</span>. We've reserved your spot. We will send the live webinar access link directly to <span className="text-white">{formData.email}</span> and send a reminder to your WhatsApp number (<span className="text-white">{formData.whatsapp}</span>).
+                Thank you, <span className="text-white font-bold">{formData.fullName}</span>.
+                {' '}We've reserved your spot. We will send the live webinar access link directly to{' '}
+                <span className="text-white">{formData.email}</span> and send a reminder to your
+                WhatsApp number (<span className="text-white">{formData.whatsapp}</span>).
               </p>
             </div>
           )}
         </div>
+      </section>
 
+      {/* PAST CAMPS */}
+      <section className="border-t border-neutral-900 bg-neutral-950 py-24 px-6 lg:px-12">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-sm font-mono text-red-600 uppercase tracking-widest mb-4">
+              Our Journey
+            </p>
+            <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tight">
+              Past Camps
+            </h2>
+            <p className="mt-5 max-w-2xl mx-auto text-neutral-400 font-mono text-xs md:text-sm leading-relaxed">
+              A look back at the athletes, hard work and memories that helped build Sri Lanka Dunks.
+            </p>
+          </div>
+
+          <div className="space-y-24">
+            {pastCamps.map((camp) => (
+              <article key={camp.year} className="border-t border-neutral-800 pt-10">
+                <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
+                  <div>
+                    <p className="text-red-600 font-mono text-xs uppercase tracking-widest font-bold mb-3">
+                      Sri Lanka Dunks / {camp.year}
+                    </p>
+                    <h3 className="text-3xl md:text-5xl font-black uppercase tracking-tight">
+                      {camp.title}
+                    </h3>
+                  </div>
+                  <p className="text-neutral-400 font-mono text-xs leading-relaxed max-w-xl">
+                    {camp.description}
+                  </p>
+                </div>
+
+                <div className={`grid grid-cols-1 sm:grid-cols-2 ${camp.year === '2025' ? 'lg:grid-cols-3' : 'lg:grid-cols-3'} gap-4`}>
+                  {camp.photos.map((photo, index) => (
+                    <div
+                      key={photo}
+                      className="group relative overflow-hidden border border-neutral-800 bg-black rounded-lg"
+                    >
+                      <img
+                        src={photo}
+                        alt={`Sri Lanka Dunks ${camp.year} camp photo ${index + 1}`}
+                        loading="lazy"
+                        className="w-full h-72 sm:h-80 object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
+                    </div>
+                  ))}
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
       </section>
 
       <Footer />
