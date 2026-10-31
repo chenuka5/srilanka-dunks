@@ -72,7 +72,7 @@ export default function HomePage() {
   <div className="absolute inset-0 z-0">
     <img
       src="/hero-bg-.jpg"
-      alt="Sri Lanka Dunks Performance"
+      alt="Sri Lanka Dunks vertical jump and athletic performance training"
       
 
 className="w-full h-full object-cover object-[center_65%] md:object-[center_25%] opacity-55 filter grayscale contrast-125 brightness-105"
@@ -89,8 +89,8 @@ className="w-full h-full object-cover object-[center_65%] md:object-[center_25%]
     </h1>
 
     <p className="text-neutral-300 font-mono text-sm md:text-base max-w-2xl mx-auto uppercase tracking-widest leading-relaxed">
-      Modern athletic performance training for the next generation of Sri Lankan athletes.
-    </p>
+  Vertical jump training, explosive power and athletic performance development for the next generation of Sri Lankan athletes.
+</p>
 
     {!user && (
       <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
@@ -168,7 +168,7 @@ className="w-full h-full object-cover object-[center_65%] md:object-[center_25%]
   {/* Background photo */}
   <img
     src="/goal-was-never-to-dunk.jpg"
-    alt="Basketball athlete performing a dunk"
+    alt="Basketball athlete performing an explosive dunk"
     className="absolute inset-0 -z-20 h-full w-full object-cover object-[center_35%]"
     loading="lazy"
   />
@@ -338,7 +338,7 @@ className="w-full h-full object-cover object-[center_65%] md:object-[center_25%]
       <div className="group relative min-h-[320px] overflow-hidden rounded border border-neutral-800 bg-neutral-900">
         <img
           src="/strength-conditioning.jpg"
-          alt="Athlete performing a trap-bar strength exercise"
+          alt="Athlete performing a trap-bar strength training"
           loading="lazy"
           className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
         />
@@ -356,7 +356,7 @@ className="w-full h-full object-cover object-[center_65%] md:object-[center_25%]
       <div className="group relative min-h-[320px] overflow-hidden rounded border border-neutral-800 bg-neutral-900">
         <img
           src="/power-training.jpg"
-          alt="Athlete working on power development"
+          alt="Athlete developing explosive power through strength training"
           loading="lazy"
           className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
         />
@@ -392,7 +392,7 @@ className="w-full h-full object-cover object-[center_65%] md:object-[center_25%]
       <div className="group relative min-h-[320px] overflow-hidden rounded border border-neutral-800 bg-neutral-900">
         <img
           src="/speed-training.jpg"
-          alt="Athlete demonstrating athletic movement during a training session"
+          alt="Athlete practising speed and change of direction drills"
           loading="lazy"
           className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
         />
@@ -410,7 +410,7 @@ className="w-full h-full object-cover object-[center_65%] md:object-[center_25%]
       <div className="group relative min-h-[320px] overflow-hidden rounded border border-neutral-800 bg-neutral-900">
         <img
           src="/athlete-development.jpg"
-          alt="Athletes developing their physical performance"
+          alt="Athlete performing plyometric jump training"
           loading="lazy"
           className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
         />

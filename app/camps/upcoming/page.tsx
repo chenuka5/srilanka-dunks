@@ -1,6 +1,25 @@
+
+import type { Metadata } from 'next';
 import Navbar from '@/components/navbar';
 import Footer from '@/components/footer';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'Upcoming Vertical Jump Camp',
+  description:
+    'Discover upcoming Sri Lanka Dunks vertical jump camps. Join the priority waitlist for updates, training opportunities and camp announcements.',
+  alternates: {
+    canonical: '/camps/upcoming',
+  },
+  openGraph: {
+    title: 'Upcoming Vertical Jump Camp | Sri Lanka Dunks',
+    description:
+      'Stay updated on upcoming Sri Lanka Dunks vertical jump camps. Join the priority waitlist for training opportunities and camp announcements.',
+    url: 'https://srilankadunks.com/camps/upcoming',
+    siteName: 'Sri Lanka Dunks',
+    type: 'website',
+  },
+};
 
 export default function UpcomingCampPage() {
   return (
@@ -12,11 +31,11 @@ export default function UpcomingCampPage() {
           <p className="text-red-600 font-mono text-xs uppercase tracking-widest font-bold">
             Sri Lanka Dunks
           </p>
-          
+
           <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tight leading-none">
             Next Vertical Jump Camp
           </h1>
-          
+
           <div className="inline-block border border-neutral-800 bg-neutral-950 px-6 py-3 rounded text-neutral-300 font-mono text-sm uppercase tracking-widest">
             Coming Soon
           </div>
@@ -26,8 +45,8 @@ export default function UpcomingCampPage() {
           </p>
 
           <div className="pt-8">
-            <Link 
-              href="/join" 
+            <Link
+              href="/join"
               className="inline-block bg-red-600 hover:bg-red-700 text-white font-mono text-xs md:text-sm uppercase tracking-widest px-10 py-5 rounded font-bold shadow-lg shadow-red-600/20 hover:scale-105 transition-all"
             >
               Join The Waitlist →

@@ -4,40 +4,45 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://srilankadunks.com'),
+
   title: {
-    default: 'Sri Lanka Dunks | Athletic Performance Training',
+    default: 'Sri Lanka Dunks | Vertical Jump & Athletic Performance Training',
     template: '%s | Sri Lanka Dunks',
   },
+
   description:
-    'Sri Lanka Dunks helps Sri Lankan athletes jump higher, move better and become stronger through modern athletic performance training, vertical jump development, strength, power and plyometrics.',
+    'Sri Lanka Dunks helps Sri Lankan athletes jump higher and become better athletes through vertical jump training, basketball performance, strength and conditioning, explosive power and plyometrics.',
+
   openGraph: {
-    title: 'Sri Lanka Dunks | Rise Above.',
+    title: 'Sri Lanka Dunks | Vertical Jump & Athletic Performance Training',
     description:
-      'Athletic performance for Sri Lankan athletes. Take the vertical jump test, view the leaderboard, and access world-class training.',
-    url: 'https://srilankadunks.com',
+      'Build your vertical jump, explosive power and athletic performance. Discover modern sports performance training for athletes in Sri Lanka.',
     siteName: 'Sri Lanka Dunks',
     images: [
       {
         url: '/hero-bg-.jpg',
         width: 1200,
         height: 630,
-        alt: 'Sri Lanka Dunks - Rise Above.',
+        alt: 'Sri Lanka Dunks - Vertical Jump and Athletic Performance Training',
       },
     ],
-    locale: 'en_US',
+    locale: 'en_LK',
     type: 'website',
   },
+
   twitter: {
     card: 'summary_large_image',
-    title: 'Sri Lanka Dunks | Rise Above.',
+    title: 'Sri Lanka Dunks | Vertical Jump & Athletic Performance',
     description:
-      'Athletic performance for Sri Lankan athletes. Take the vertical jump test, view the leaderboard, and access world-class training.',
+      'Helping Sri Lankan athletes jump higher, build explosive power and improve athletic performance.',
     images: ['/hero-bg-.jpg'],
   },
+
   robots: {
     index: true,
     follow: true,
   },
+
   icons: {
     icon: '/favicon.ico',
   },

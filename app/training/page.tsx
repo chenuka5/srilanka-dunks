@@ -5,11 +5,19 @@ import Footer from '@/components/footer';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Athletic Training | Strength, Power and Plyometrics',
+  title: 'Vertical Jump & Athletic Training in Sri Lanka',
   description:
-    'Explore the Sri Lanka Dunks training methodology, including force production, rate of force development, plyometrics, speed and jump biomechanics.',
+    'Looking to jump higher and become a better athlete? Sri Lanka Dunks helps Sri Lankan basketball, volleyball and track & field athletes develop vertical jump, explosive power, strength, speed and athletic performance.',
   alternates: {
-    canonical: 'https://srilankadunks.com/training',
+    canonical: '/training',
+  },
+  openGraph: {
+    title: 'Vertical Jump & Athletic Training in Sri Lanka | Sri Lanka Dunks',
+    description:
+      'Develop your vertical jump, explosive power and athletic performance. Explore structured training for Sri Lankan athletes.',
+    url: 'https://srilankadunks.com/training',
+    siteName: 'Sri Lanka Dunks',
+    type: 'website',
   },
 };
 
@@ -64,7 +72,10 @@ export default function TrainingPage() {
         <div className="max-w-5xl mx-auto space-y-24">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {pillars.map((pillar, index) => (
-              <div key={index} className="bg-black border border-neutral-800 p-8 rounded hover:border-red-600 transition-colors group">
+              <div
+                key={index}
+                className="bg-black border border-neutral-800 p-8 rounded hover:border-red-600 transition-colors group"
+              >
                 <div className="mb-6">
                   <span className="text-red-600 font-mono text-xs uppercase tracking-widest font-bold block mb-2">
                     0{index + 1} // {pillar.subtitle}
@@ -77,10 +88,15 @@ export default function TrainingPage() {
                   {pillar.desc}
                 </p>
                 <div className="pt-6 border-t border-neutral-900">
-                  <h3 className="text-xs font-mono uppercase tracking-widest text-neutral-600 mb-3">Key Modalities:</h3>
+                  <h3 className="text-xs font-mono uppercase tracking-widest text-neutral-600 mb-3">
+                    Key Modalities:
+                  </h3>
                   <div className="flex flex-wrap gap-2">
                     {pillar.metrics.map((metric, idx) => (
-                      <span key={idx} className="bg-neutral-900 text-neutral-300 font-mono text-[10px] uppercase tracking-widest px-3 py-1.5 rounded">
+                      <span
+                        key={idx}
+                        className="bg-neutral-900 text-neutral-300 font-mono text-[10px] uppercase tracking-widest px-3 py-1.5 rounded"
+                      >
                         {metric}
                       </span>
                     ))}
@@ -92,26 +108,49 @@ export default function TrainingPage() {
 
           <div className="pt-24 border-t border-neutral-900">
             <div className="text-center mb-16 space-y-4">
-              <h2 className="text-sm font-mono text-red-600 uppercase tracking-widest font-bold">The Target</h2>
-              <h3 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-white">Who is this for?</h3>
+              <h2 className="text-sm font-mono text-red-600 uppercase tracking-widest font-bold">
+                The Target
+              </h2>
+              <h3 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-white">
+                Who is this for?
+              </h3>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="bg-black border border-neutral-800 p-8 rounded hover:bg-neutral-900 transition-colors">
-                <h4 className="text-xl font-bold uppercase tracking-tight text-white mb-2">Court Athletes</h4>
-                <p className="text-neutral-400 font-mono text-sm leading-relaxed">Basketball and volleyball players looking to play above the rim, increase their block radius, and dominate the airspace.</p>
+                <h4 className="text-xl font-bold uppercase tracking-tight text-white mb-2">
+                  Court Athletes
+                </h4>
+                <p className="text-neutral-400 font-mono text-sm leading-relaxed">
+                  Basketball and volleyball players looking to play above the rim, increase their block radius, and dominate the airspace.
+                </p>
               </div>
+
               <div className="bg-black border border-neutral-800 p-8 rounded hover:bg-neutral-900 transition-colors">
-                <h4 className="text-xl font-bold uppercase tracking-tight text-white mb-2">Field Athletes</h4>
-                <p className="text-neutral-400 font-mono text-sm leading-relaxed">Rugby and football players needing explosive first-step acceleration, higher top-end speed, and raw power for contact.</p>
+                <h4 className="text-xl font-bold uppercase tracking-tight text-white mb-2">
+                  Field Athletes
+                </h4>
+                <p className="text-neutral-400 font-mono text-sm leading-relaxed">
+                  Rugby and football players needing explosive first-step acceleration, higher top-end speed, and raw power for contact.
+                </p>
               </div>
+
               <div className="bg-black border border-neutral-800 p-8 rounded hover:bg-neutral-900 transition-colors">
-                <h4 className="text-xl font-bold uppercase tracking-tight text-white mb-2">Track & Field</h4>
-                <p className="text-neutral-400 font-mono text-sm leading-relaxed">High jumpers, long jumpers, and sprinters seeking to optimize their force application and stretch-shortening cycle.</p>
+                <h4 className="text-xl font-bold uppercase tracking-tight text-white mb-2">
+                  Track & Field
+                </h4>
+                <p className="text-neutral-400 font-mono text-sm leading-relaxed">
+                  High jumpers, long jumpers, and sprinters seeking to optimize their force application and stretch-shortening cycle.
+                </p>
               </div>
+
               <div className="bg-black border border-neutral-800 p-8 rounded hover:bg-neutral-900 transition-colors">
-                <h4 className="text-xl font-bold uppercase tracking-tight text-white mb-2">Everyday Competitors</h4>
-                <p className="text-neutral-400 font-mono text-sm leading-relaxed">Anyone tired of feeling heavy on their feet. If your goal is to build structural resilience and effortless bounce, this is for you.</p>
+                <h4 className="text-xl font-bold uppercase tracking-tight text-white mb-2">
+                  Everyday Competitors
+                </h4>
+                <p className="text-neutral-400 font-mono text-sm leading-relaxed">
+                  Anyone tired of feeling heavy on their feet. If your goal is to build structural resilience and effortless bounce, this is for you.
+                </p>
               </div>
             </div>
           </div>
