@@ -2,9 +2,9 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Training Camps',
+  title: 'Sri Lanka Dunks Jump Camps & Online Webinar',
   description:
-    'Explore Sri Lanka Dunks athletic training camps and register your interest in upcoming events.',
+    'Explore Sri Lanka Dunks vertical jump training camps, past events and free online webinars. Develop explosive power, jumping ability and athletic performance.',
   alternates: {
     canonical: 'https://srilankadunks.com/camps',
   },
