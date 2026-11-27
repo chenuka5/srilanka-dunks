@@ -15,34 +15,64 @@ export default function ResetPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
-  const [isValidSession, setIsValidSession] = useState(false);
+  const [isValidRecovery, setIsValidRecovery] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
   useEffect(() => {
     let mounted = true;
+    let recoveryDetected = false;
 
-    const checkSession = async () => {
+    const checkRecoverySession = async () => {
+      const hashParams = new URLSearchParams(
+        window.location.hash.substring(1)
+      );
+
+      const queryParams = new URLSearchParams(
+        window.location.search
+      );
+
+      const recoveryMarker =
+        hashParams.get('type') === 'recovery' ||
+        queryParams.get('type') === 'recovery';
+
       const {
         data: { session },
       } = await supabase.auth.getSession();
 
-      if (mounted) {
-        setIsValidSession(!!session);
-        setIsChecking(false);
+      if (!mounted) return;
+
+      if (recoveryMarker && session) {
+        recoveryDetected = true;
+        setIsValidRecovery(true);
       }
+
+      setIsChecking(false);
     };
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'PASSWORD_RECOVERY' && session && mounted) {
-        setIsValidSession(true);
+      if (
+        mounted &&
+        event === 'PASSWORD_RECOVERY' &&
+        session
+      ) {
+        recoveryDetected = true;
+        setIsValidRecovery(true);
         setIsChecking(false);
+      }
+
+      if (
+        mounted &&
+        event === 'SIGNED_OUT' &&
+        recoveryDetected
+      ) {
+        setIsValidRecovery(false);
       }
     });
 
-    checkSession();
+    checkRecoverySession();
 
     return () => {
       mounted = false;
@@ -50,14 +80,25 @@ export default function ResetPasswordPage() {
     };
   }, []);
 
-  const handlePasswordUpdate = async (e: React.FormEvent) => {
+  const handlePasswordUpdate = async (
+    e: React.FormEvent
+  ) => {
     e.preventDefault();
 
     setError('');
     setMessage('');
 
+    if (!isValidRecovery) {
+      setError(
+        'Your recovery session is invalid. Please request a new reset link.'
+      );
+      return;
+    }
+
     if (password.length < 8) {
-      setError('Your password must contain at least 8 characters.');
+      setError(
+        'Your password must contain at least 8 characters.'
+      );
       return;
     }
 
@@ -68,22 +109,35 @@ export default function ResetPasswordPage() {
 
     setIsLoading(true);
 
-    const { error: updateError } = await supabase.auth.updateUser({
-      password,
-    });
+    try {
+      const { error: updateError } =
+        await supabase.auth.updateUser({
+          password,
+        });
 
-    if (updateError) {
-      setError(updateError.message);
+      if (updateError) {
+        setError(updateError.message);
+        setIsLoading(false);
+        return;
+      }
+
+      setMessage(
+        'Your password has been updated successfully.'
+      );
+
       setIsLoading(false);
-      return;
+
+      setTimeout(async () => {
+        await supabase.auth.signOut();
+        router.push('/login');
+        router.refresh();
+      }, 1500);
+    } catch {
+      setError(
+        'An unexpected error occurred. Please try again.'
+      );
+      setIsLoading(false);
     }
-
-    setMessage('Your password has been updated successfully.');
-
-    setTimeout(() => {
-      router.push('/dashboard');
-      router.refresh();
-    }, 1500);
   };
 
   return (
@@ -109,7 +163,7 @@ export default function ResetPasswordPage() {
               <p className="text-neutral-400 font-mono text-xs text-center uppercase tracking-widest">
                 Verifying recovery link...
               </p>
-            ) : !isValidSession ? (
+            ) : !isValidRecovery ? (
               <div className="space-y-5 text-center">
                 <p className="text-red-500 font-mono text-xs uppercase tracking-widest">
                   This password reset link is invalid or has expired.
@@ -181,7 +235,9 @@ export default function ResetPasswordPage() {
                   disabled={isLoading || !!message}
                   className="w-full bg-red-600 hover:bg-red-700 disabled:bg-neutral-800 disabled:text-neutral-500 text-white font-mono text-sm uppercase tracking-widest p-4 rounded font-bold transition-all shadow-lg shadow-red-600/20"
                 >
-                  {isLoading ? 'Updating Password...' : 'Update Password →'}
+                  {isLoading
+                    ? 'Updating Password...'
+                    : 'Update Password →'}
                 </button>
               </form>
             )}
