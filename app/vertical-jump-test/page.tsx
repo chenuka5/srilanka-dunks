@@ -48,6 +48,7 @@ export default function VerticalJumpTestPage() {
       return;
     }
 
+    // Calculate results immediately, independently of authentication.
     const standingVertical = Number((standingMax - standing).toFixed(1));
     const runningVertical = Number((runningMax - standing).toFixed(1));
 
@@ -57,28 +58,39 @@ export default function VerticalJumpTestPage() {
     setIsSaving(true);
 
     try {
+      // Read the existing session without making a remote user verification request.
       const {
-        data: { user },
+        data: { session },
         error: authError,
-      } = await supabase.auth.getUser();
+      } = await supabase.auth.getSession();
 
       if (authError) {
-        setSaveError('Unable to check your account. Please try again.');
+        console.error('Session error:', authError.message);
+
+        setSaveError(
+          'Your results were calculated, but we could not access your session. Please log in again to save them.'
+        );
+
         setIsSaving(false);
         return;
       }
 
+      const user = session?.user;
+
+      // Public visitors can still calculate their results.
       if (!user) {
         setIsLoggedIn(false);
         setSaveMessage(
           'Your results have been calculated. Log in to your athlete account to save your measurements and track your progress.'
         );
+
         setIsSaving(false);
         return;
       }
 
       setIsLoggedIn(true);
 
+      // Save the results against the authenticated athlete's profile.
       const { error: insertError } = await supabase
         .from('vertical_jump_logs')
         .insert({
@@ -89,9 +101,11 @@ export default function VerticalJumpTestPage() {
 
       if (insertError) {
         console.error('Vertical jump save error:', insertError.message);
+
         setSaveError(
           'Your results were calculated, but we could not save them. Please try again.'
         );
+
         setIsSaving(false);
         return;
       }
@@ -101,7 +115,10 @@ export default function VerticalJumpTestPage() {
       );
     } catch (error) {
       console.error('Vertical jump error:', error);
-      setSaveError('An unexpected error occurred. Please try again.');
+
+      setSaveError(
+        'Your results were calculated, but we could not save them. Please try again.'
+      );
     }
 
     setIsSaving(false);
@@ -131,13 +148,11 @@ export default function VerticalJumpTestPage() {
 
       <section className="py-24 px-6 bg-neutral-950 flex-grow">
         <div className="max-w-2xl mx-auto">
-
           <form
             onSubmit={handleCalculate}
             className="space-y-8 bg-black p-8 md:p-12 rounded border border-neutral-800"
           >
             <div className="space-y-6">
-
               <div>
                 <label className="block text-sm font-mono uppercase tracking-widest text-neutral-400 mb-2">
                   1. Standing Reach (CM)
@@ -200,7 +215,6 @@ export default function VerticalJumpTestPage() {
                   placeholder="e.g. 295"
                 />
               </div>
-
             </div>
 
             {saveError && (
@@ -220,7 +234,6 @@ export default function VerticalJumpTestPage() {
 
           {standingResult !== null && runningResult !== null && (
             <div className="mt-12 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-
               <div className="text-center p-10 border border-neutral-800 bg-black rounded">
                 <p className="text-neutral-400 font-mono text-xs uppercase tracking-widest mb-3">
                   Standing Vertical Jump
@@ -287,10 +300,8 @@ export default function VerticalJumpTestPage() {
                   </Link>
                 </div>
               </div>
-
             </div>
           )}
-
         </div>
       </section>
 
