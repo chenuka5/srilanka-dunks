@@ -3,42 +3,69 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 import Navbar from '@/components/navbar';
 import Footer from '@/components/footer';
 import Link from 'next/link';
 
+const supabase = createClient();
+
 export default function LoginPage() {
   const router = useRouter();
+
   const [isLoading, setIsLoading] = useState(false);
+  const [isCheckingSession, setIsCheckingSession] = useState(true);
   const [error, setError] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  // Check if session already exists
   useEffect(() => {
-    const checkSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+    let mounted = true;
 
-      if (session) {
-        router.push('/dashboard');
+    const checkSession = async () => {
+      try {
+        const {
+          data: { session },
+          error: sessionError,
+        } = await supabase.auth.getSession();
+
+        if (!mounted) return;
+
+        if (sessionError) {
+          console.error('Session check error:', sessionError.message);
+        }
+
+        if (session) {
+          router.replace('/dashboard');
+          router.refresh();
+          return;
+        }
+      } catch (err) {
+        console.error('Unable to check session:', err);
+      }
+
+      if (mounted) {
+        setIsCheckingSession(false);
       }
     };
 
     checkSession();
+
+    return () => {
+      mounted = false;
+    };
   }, [router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
     setIsLoading(true);
     setError('');
 
     try {
       const { data, error: authError } =
         await supabase.auth.signInWithPassword({
-          email,
+          email: email.trim(),
           password,
         });
 
@@ -47,21 +74,36 @@ export default function LoginPage() {
           authError.message ||
             'Invalid email or password. Please try again.'
         );
+
         setIsLoading(false);
         return;
       }
 
-      if (data?.session) {
-        router.push('/dashboard');
+      if (data.session) {
+        router.replace('/dashboard');
         router.refresh();
+      } else {
+        setError('Login was unsuccessful. Please try again.');
+        setIsLoading(false);
       }
-    } catch (err: any) {
+    } catch (err) {
+      console.error('Login error:', err);
+
       setError(
         'An unexpected network error occurred. Please try again.'
       );
+
       setIsLoading(false);
     }
   };
+
+  if (isCheckingSession) {
+    return (
+      <main className="min-h-screen bg-black flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-red-600 border-t-transparent rounded-full animate-spin" />
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen flex flex-col bg-black text-white font-sans antialiased">
