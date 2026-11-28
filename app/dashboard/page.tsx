@@ -24,14 +24,11 @@ export default async function DashboardPage() {
 
   const {
     data: { user },
-    error: authError,
   } = await supabase.auth.getUser();
 
-  if (authError || !user) {
-    redirect('/login');
-  }
+  if (!user) redirect('/login');
 
-  // FETCH ATHLETE PROFILE
+  // ATHLETE PROFILE
   const { data: profile } = await supabase
     .from('profiles')
     .select('first_name, last_name, avatar_url, role')
@@ -49,7 +46,7 @@ export default async function DashboardPage() {
       .filter(Boolean)
       .join(' ') || firstName;
 
-  // FETCH SIX-WEEK PROGRAMME
+  // SIX-WEEK PROGRAMME
   const { data: program, error: programError } = await supabase
     .from('programs')
     .select('id, title')
@@ -57,7 +54,7 @@ export default async function DashboardPage() {
     .maybeSingle();
 
   if (programError) {
-    console.error('Programme lookup error:', programError.message);
+    console.error('Programme lookup:', programError.message);
   }
 
   let weeks: any[] = [];
@@ -65,7 +62,6 @@ export default async function DashboardPage() {
   let setCompletions: any[] = [];
 
   if (program) {
-    // FETCH PROGRAMME WEEKS
     const { data: weekData, error: weeksError } = await supabase
       .from('program_weeks')
       .select('id, week_number, focus_description')
@@ -73,7 +69,7 @@ export default async function DashboardPage() {
       .order('week_number', { ascending: true });
 
     if (weeksError) {
-      console.error('Programme weeks error:', weeksError.message);
+      console.error('Programme weeks:', weeksError.message);
     }
 
     weeks = weekData || [];
@@ -81,44 +77,43 @@ export default async function DashboardPage() {
     const weekIds = weeks.map((week) => week.id);
 
     if (weekIds.length > 0) {
-      // FETCH WORKOUTS AND THEIR EXERCISE SET REQUIREMENTS
-      const { data: workoutData, error: workoutsError } = await supabase
-        .from('workouts')
-        .select(`
-          id,
-          title,
-          week_id,
-          workout_exercises (
+      const { data: workoutData, error: workoutsError } =
+        await supabase
+          .from('workouts')
+          .select(`
             id,
-            sets
-          )
-        `)
-        .in('week_id', weekIds);
+            title,
+            week_id,
+            workout_exercises (
+              id,
+              sets
+            )
+          `)
+          .in('week_id', weekIds);
 
       if (workoutsError) {
-        console.error('Dashboard workouts error:', workoutsError.message);
+        console.error('Programme workouts:', workoutsError.message);
       }
 
       workouts = workoutData || [];
 
-      const workoutExerciseIds = workouts.flatMap((workout) =>
+      const exerciseIds = workouts.flatMap((workout) =>
         (workout.workout_exercises || []).map(
           (exercise: any) => exercise.id
         )
       );
 
-      if (workoutExerciseIds.length > 0) {
-        // FETCH THIS ATHLETE'S SAVED SET COMPLETIONS
+      if (exerciseIds.length > 0) {
         const { data: completionData, error: completionError } =
           await supabase
             .from('workout_set_completions')
             .select('workout_exercise_id, set_number')
             .eq('profile_id', user.id)
-            .in('workout_exercise_id', workoutExerciseIds);
+            .in('workout_exercise_id', exerciseIds);
 
         if (completionError) {
           console.error(
-            'Dashboard set completion error:',
+            'Set completion lookup:',
             completionError.message
           );
         }
@@ -128,34 +123,36 @@ export default async function DashboardPage() {
     }
   }
 
-  // BUILD A SET COMPLETION LOOKUP
+  // SET COMPLETION CALCULATIONS
   const completedSetKeys = new Set(
     setCompletions.map(
-      (item) => `${item.workout_exercise_id}-${item.set_number}`
+      (item) =>
+        `${item.workout_exercise_id}-${item.set_number}`
     )
   );
 
-  // CALCULATE TOTAL AND COMPLETED SETS
   let totalSets = 0;
   let completedSets = 0;
 
   workouts.forEach((workout) => {
-    (workout.workout_exercises || []).forEach((exercise: any) => {
-      const prescribedSets = Math.max(0, Number(exercise.sets) || 0);
+    (workout.workout_exercises || []).forEach(
+      (exercise: any) => {
+        const sets = Math.max(0, Number(exercise.sets) || 0);
 
-      totalSets += prescribedSets;
+        totalSets += sets;
 
-      for (let setNumber = 1; setNumber <= prescribedSets; setNumber++) {
-        const key = `${exercise.id}-${setNumber}`;
-
-        if (completedSetKeys.has(key)) {
-          completedSets++;
+        for (let number = 1; number <= sets; number++) {
+          if (
+            completedSetKeys.has(`${exercise.id}-${number}`)
+          ) {
+            completedSets++;
+          }
         }
       }
-    });
+    );
   });
 
-  // A SESSION COUNTS AS COMPLETED ONLY WHEN ALL ITS SETS ARE DONE.
+  // A SESSION COUNTS AS COMPLETE WHEN ALL ITS SETS ARE COMPLETE
   const completedWorkoutIds = new Set(
     workouts
       .filter((workout) => {
@@ -163,43 +160,23 @@ export default async function DashboardPage() {
 
         if (exercises.length === 0) return false;
 
-        const expectedSets = exercises.reduce(
-          (total: number, exercise: any) =>
-            total + Math.max(0, Number(exercise.sets) || 0),
-          0
-        );
+        let expectedSets = 0;
+        let finishedSets = 0;
 
-        if (expectedSets === 0) return false;
+        exercises.forEach((exercise: any) => {
+          const sets = Math.max(0, Number(exercise.sets) || 0);
+          expectedSets += sets;
 
-        const completedCount = exercises.reduce(
-          (total: number, exercise: any) => {
-            const prescribedSets = Math.max(
-              0,
-              Number(exercise.sets) || 0
-            );
-
-            let exerciseCompleted = 0;
-
-            for (
-              let setNumber = 1;
-              setNumber <= prescribedSets;
-              setNumber++
+          for (let number = 1; number <= sets; number++) {
+            if (
+              completedSetKeys.has(`${exercise.id}-${number}`)
             ) {
-              if (
-                completedSetKeys.has(
-                  `${exercise.id}-${setNumber}`
-                )
-              ) {
-                exerciseCompleted++;
-              }
+              finishedSets++;
             }
+          }
+        });
 
-            return total + exerciseCompleted;
-          },
-          0
-        );
-
-        return completedCount === expectedSets;
+        return expectedSets > 0 && finishedSets === expectedSets;
       })
       .map((workout) => workout.id)
   );
@@ -207,13 +184,12 @@ export default async function DashboardPage() {
   const totalWorkouts = workouts.length;
   const completedWorkouts = completedWorkoutIds.size;
 
-  // OVERALL PROGRESS IS BASED ON COMPLETED SETS.
   const programmeProgress =
     totalSets > 0
       ? Math.round((completedSets / totalSets) * 100)
       : 0;
 
-  // WEEKLY SESSION COMPLETION
+  // WEEKLY PROGRESS
   const weeklyProgress = weeks.map((week) => {
     const weekWorkouts = workouts.filter(
       (workout) => workout.week_id === week.id
@@ -230,18 +206,22 @@ export default async function DashboardPage() {
     };
   });
 
-  // FETCH LATEST VERTICAL JUMP TESTS
+  // JUMP TEST HISTORY
   const { data: jumpLogs, error: jumpError } = await supabase
     .from('vertical_jump_logs')
-    .select(
-      'id, standing_vertical_cm, running_vertical_cm, date_recorded, is_verified'
-    )
+    .select(`
+      id,
+      standing_vertical_cm,
+      running_vertical_cm,
+      date_recorded,
+      is_verified
+    `)
     .eq('profile_id', user.id)
     .order('date_recorded', { ascending: false })
     .limit(5);
 
   if (jumpError) {
-    console.error('Jump history error:', jumpError.message);
+    console.error('Jump history:', jumpError.message);
   }
 
   const latestJump = jumpLogs?.[0] || null;
@@ -264,6 +244,7 @@ export default async function DashboardPage() {
       <section className="pt-36 pb-12 px-6 border-b border-neutral-900 bg-neutral-950">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+
             <div className="flex items-center gap-5">
               <div className="w-20 h-20 rounded-full border-2 border-red-600 overflow-hidden bg-neutral-900 flex-shrink-0 flex items-center justify-center">
                 {profile?.avatar_url ? (
@@ -285,7 +266,10 @@ export default async function DashboardPage() {
                 </p>
 
                 <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight">
-                  Welcome back, <span className="text-neutral-500">{firstName}.</span>
+                  Welcome back,{' '}
+                  <span className="text-neutral-500">
+                    {firstName}.
+                  </span>
                 </h1>
 
                 <p className="text-neutral-500 font-mono text-xs uppercase tracking-widest mt-2">
@@ -308,12 +292,19 @@ export default async function DashboardPage() {
               >
                 Test Your Vertical
               </Link>
+
+              <Link
+                href="/dashboard/profile"
+                className="border border-neutral-700 hover:border-red-600 text-white px-6 py-4 rounded font-mono text-xs uppercase tracking-widest font-bold transition-all text-center"
+              >
+                My Athlete Profile →
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* MAIN DASHBOARD */}
+      {/* DASHBOARD CONTENT */}
       <section className="py-12 px-6 flex-grow bg-black">
         <div className="max-w-7xl mx-auto space-y-12">
 
@@ -425,7 +416,6 @@ export default async function DashboardPage() {
                   {completedSets} / {totalSets} sets completed
                 </p>
               </div>
-
             </div>
           </div>
 
@@ -433,6 +423,7 @@ export default async function DashboardPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
             <div className="lg:col-span-2 bg-neutral-950 border border-neutral-800 rounded p-6 md:p-8">
+
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>
                   <p className="text-red-600 font-mono text-[10px] uppercase tracking-widest font-bold">
@@ -451,8 +442,8 @@ export default async function DashboardPage() {
 
               <p className="text-neutral-400 text-sm leading-relaxed max-w-xl">
                 Build your foundations, develop strength, improve jumping
-                mechanics and progress towards better vertical jump performance
-                through a structured six-week training programme.
+                mechanics and progress towards better vertical jump
+                performance through a structured six-week training programme.
               </p>
 
               <div className="mt-8">
@@ -497,7 +488,7 @@ export default async function DashboardPage() {
                       </p>
 
                       <p className="text-white text-xs font-bold uppercase mt-2">
-                        {week.focus_description || WEEK_NAMES[index] || 'Training'}
+                        {WEEK_NAMES[index] || week.focus_description || 'Training'}
                       </p>
 
                       <p className="text-neutral-500 font-mono text-[9px] uppercase tracking-widest mt-3">
@@ -525,6 +516,29 @@ export default async function DashboardPage() {
 
             {/* QUICK ACTIONS */}
             <div className="space-y-4">
+
+              <div className="bg-neutral-950 border border-neutral-800 rounded p-6">
+                <p className="text-red-600 font-mono text-[10px] uppercase tracking-widest font-bold">
+                  Athlete Profile
+                </p>
+
+                <h3 className="text-xl font-black uppercase mt-3">
+                  Update Your Details
+                </h3>
+
+                <p className="text-neutral-500 text-xs leading-relaxed mt-3">
+                  Manage your profile photo, physical measurements,
+                  sporting background and training goals.
+                </p>
+
+                <Link
+                  href="/dashboard/profile"
+                  className="inline-block text-white font-mono text-[10px] uppercase tracking-widest border-b border-red-600 pb-1 mt-6 hover:text-red-500 transition-colors"
+                >
+                  Manage Profile →
+                </Link>
+              </div>
+
               <div className="bg-neutral-950 border border-neutral-800 rounded p-6">
                 <p className="text-red-600 font-mono text-[10px] uppercase tracking-widest font-bold">
                   Performance Testing
@@ -535,8 +549,8 @@ export default async function DashboardPage() {
                 </h3>
 
                 <p className="text-neutral-500 text-xs leading-relaxed mt-3">
-                  Record your standing and running vertical jump measurements
-                  and monitor your progress.
+                  Record your standing and running vertical jump
+                  measurements and monitor your progress.
                 </p>
 
                 <Link
@@ -557,8 +571,8 @@ export default async function DashboardPage() {
                 </h3>
 
                 <p className="text-neutral-500 text-xs leading-relaxed mt-3">
-                  See the verified vertical jump performances of athletes
-                  across the Sri Lanka Dunks community.
+                  See the verified vertical jump performances of
+                  athletes across the Sri Lanka Dunks community.
                 </p>
 
                 <Link
@@ -571,7 +585,7 @@ export default async function DashboardPage() {
             </div>
           </div>
 
-          {/* LATEST JUMP TESTS */}
+          {/* RECENT JUMP TESTS */}
           <div>
             <div className="mb-6">
               <p className="text-red-600 font-mono text-[10px] uppercase tracking-widest font-bold">
@@ -659,7 +673,6 @@ export default async function DashboardPage() {
               Signed in as {user.email}
             </p>
           </div>
-
         </div>
       </section>
 
