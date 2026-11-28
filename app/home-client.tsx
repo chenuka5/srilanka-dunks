@@ -32,21 +32,35 @@ export default function HomePage() {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
 
-      const { data: leaderboard } = await supabase
+      const { data: leaderboard, error: leaderboardError } = await supabase
         .from('vertical_jump_logs')
         .select(`
+          id,
           running_vertical_cm,
           standing_vertical_cm,
           sport,
           location,
-          profiles (*)
+          profiles (
+            id,
+            first_name,
+            last_name,
+            avatar_url,
+            sport,
+            city,
+            country
+          )
         `)
         .eq('is_verified', true)
         .eq('show_on_leaderboard', true)
-        .order('running_vertical_cm', { ascending: false })
+        .order('running_vertical_cm', { ascending: false, nullsFirst: false })
+        .order('standing_vertical_cm', { ascending: false })
         .limit(5);
 
-      if (leaderboard) setAthletes(leaderboard);
+      if (leaderboardError) {
+        console.error('Homepage leaderboard error:', leaderboardError.message);
+      } else {
+        setAthletes(leaderboard || []);
+      }
     };
 
     fetchInitialData();
@@ -453,12 +467,20 @@ className="w-full h-full object-cover object-[center_65%] md:object-[center_25%]
             <div className="space-y-3">
               {athletes.map((athlete, index) => {
                 const rawProfile = athlete.profiles as any;
-                const profile = Array.isArray(rawProfile) ? rawProfile[0] : rawProfile || {};
+                const profile = Array.isArray(rawProfile)
+                  ? rawProfile[0]
+                  : rawProfile || null;
 
-                const name = profile.first_name
-                  ? `${profile.first_name} ${profile.last_name || ''}`
-                  : profile.full_name || 'Anonymous Athlete';
-                const jump = athlete.running_vertical_cm || athlete.standing_vertical_cm || 0;
+                const name = profile
+                  ? [profile.first_name, profile.last_name]
+                      .filter(Boolean)
+                      .join(' ') || 'Sri Lanka Dunks Athlete'
+                  : 'Sri Lanka Dunks Athlete';
+                const sport = athlete.sport || profile?.sport || 'Athlete';
+                const jump =
+                  athlete.running_vertical_cm ??
+                  athlete.standing_vertical_cm ??
+                  0;
                 const rank = index + 1;
                 const isRank1 = rank === 1;
 
@@ -476,7 +498,7 @@ className="w-full h-full object-cover object-[center_65%] md:object-[center_25%]
                       <div>
                         <h4 className="text-base sm:text-lg font-bold uppercase tracking-tight text-white">{name}</h4>
                         <p className="text-neutral-500 font-mono text-[10px] uppercase tracking-widest hidden sm:block">
-                          {athlete.sport || 'Unknown Sport'}
+                          {sport}
                         </p>
                       </div>
                     </div>
