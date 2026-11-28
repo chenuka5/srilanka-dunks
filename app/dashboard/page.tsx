@@ -10,6 +10,15 @@ export const dynamic = 'force-dynamic';
 const PROGRAM_TITLE =
   'Sri Lanka Dunks - 6-Week Beginner Vertical Jump Programme';
 
+const WEEK_NAMES = [
+  'Foundations',
+  'Strength & Balance',
+  'Landing Preparation',
+  'Jump Technique',
+  'Power Development',
+  'Consolidation',
+];
+
 export default async function DashboardPage() {
   const supabase = await createServerSupabaseClient();
 
@@ -22,7 +31,7 @@ export default async function DashboardPage() {
     redirect('/login');
   }
 
-  // Fetch athlete profile.
+  // FETCH ATHLETE PROFILE
   const { data: profile } = await supabase
     .from('profiles')
     .select('first_name, last_name, avatar_url, role')
@@ -35,61 +44,194 @@ export default async function DashboardPage() {
     user.email?.split('@')[0] ||
     'Athlete';
 
-  const fullName = [profile?.first_name, profile?.last_name]
-    .filter(Boolean)
-    .join(' ') || firstName;
+  const fullName =
+    [profile?.first_name, profile?.last_name]
+      .filter(Boolean)
+      .join(' ') || firstName;
 
-  // Fetch the six-week beginner programme.
-  const { data: program } = await supabase
+  // FETCH SIX-WEEK PROGRAMME
+  const { data: program, error: programError } = await supabase
     .from('programs')
     .select('id, title')
     .eq('title', PROGRAM_TITLE)
     .maybeSingle();
 
-  let totalWorkouts = 0;
-  let completedWorkouts = 0;
-  let workoutIds: string[] = [];
+  if (programError) {
+    console.error('Programme lookup error:', programError.message);
+  }
+
+  let weeks: any[] = [];
+  let workouts: any[] = [];
+  let setCompletions: any[] = [];
 
   if (program) {
-    const { data: weeks } = await supabase
+    // FETCH PROGRAMME WEEKS
+    const { data: weekData, error: weeksError } = await supabase
       .from('program_weeks')
-      .select('id')
-      .eq('program_id', program.id);
+      .select('id, week_number, focus_description')
+      .eq('program_id', program.id)
+      .order('week_number', { ascending: true });
 
-    const weekIds = (weeks || []).map((week) => week.id);
+    if (weeksError) {
+      console.error('Programme weeks error:', weeksError.message);
+    }
+
+    weeks = weekData || [];
+
+    const weekIds = weeks.map((week) => week.id);
 
     if (weekIds.length > 0) {
-      const { data: workouts } = await supabase
+      // FETCH WORKOUTS AND THEIR EXERCISE SET REQUIREMENTS
+      const { data: workoutData, error: workoutsError } = await supabase
         .from('workouts')
-        .select('id, title, week_id')
+        .select(`
+          id,
+          title,
+          week_id,
+          workout_exercises (
+            id,
+            sets
+          )
+        `)
         .in('week_id', weekIds);
 
-      workoutIds = (workouts || []).map((workout) => workout.id);
-      totalWorkouts = workoutIds.length;
+      if (workoutsError) {
+        console.error('Dashboard workouts error:', workoutsError.message);
+      }
 
-      if (workoutIds.length > 0) {
-        const { data: completions } = await supabase
-          .from('workout_completions')
-          .select('workout_id')
-          .eq('profile_id', user.id)
-          .in('workout_id', workoutIds);
+      workouts = workoutData || [];
 
-        const completedIds = new Set(
-          (completions || []).map((item) => item.workout_id)
-        );
+      const workoutExerciseIds = workouts.flatMap((workout) =>
+        (workout.workout_exercises || []).map(
+          (exercise: any) => exercise.id
+        )
+      );
 
-        completedWorkouts = completedIds.size;
+      if (workoutExerciseIds.length > 0) {
+        // FETCH THIS ATHLETE'S SAVED SET COMPLETIONS
+        const { data: completionData, error: completionError } =
+          await supabase
+            .from('workout_set_completions')
+            .select('workout_exercise_id, set_number')
+            .eq('profile_id', user.id)
+            .in('workout_exercise_id', workoutExerciseIds);
+
+        if (completionError) {
+          console.error(
+            'Dashboard set completion error:',
+            completionError.message
+          );
+        }
+
+        setCompletions = completionData || [];
       }
     }
   }
 
+  // BUILD A SET COMPLETION LOOKUP
+  const completedSetKeys = new Set(
+    setCompletions.map(
+      (item) => `${item.workout_exercise_id}-${item.set_number}`
+    )
+  );
+
+  // CALCULATE TOTAL AND COMPLETED SETS
+  let totalSets = 0;
+  let completedSets = 0;
+
+  workouts.forEach((workout) => {
+    (workout.workout_exercises || []).forEach((exercise: any) => {
+      const prescribedSets = Math.max(0, Number(exercise.sets) || 0);
+
+      totalSets += prescribedSets;
+
+      for (let setNumber = 1; setNumber <= prescribedSets; setNumber++) {
+        const key = `${exercise.id}-${setNumber}`;
+
+        if (completedSetKeys.has(key)) {
+          completedSets++;
+        }
+      }
+    });
+  });
+
+  // A SESSION COUNTS AS COMPLETED ONLY WHEN ALL ITS SETS ARE DONE.
+  const completedWorkoutIds = new Set(
+    workouts
+      .filter((workout) => {
+        const exercises = workout.workout_exercises || [];
+
+        if (exercises.length === 0) return false;
+
+        const expectedSets = exercises.reduce(
+          (total: number, exercise: any) =>
+            total + Math.max(0, Number(exercise.sets) || 0),
+          0
+        );
+
+        if (expectedSets === 0) return false;
+
+        const completedCount = exercises.reduce(
+          (total: number, exercise: any) => {
+            const prescribedSets = Math.max(
+              0,
+              Number(exercise.sets) || 0
+            );
+
+            let exerciseCompleted = 0;
+
+            for (
+              let setNumber = 1;
+              setNumber <= prescribedSets;
+              setNumber++
+            ) {
+              if (
+                completedSetKeys.has(
+                  `${exercise.id}-${setNumber}`
+                )
+              ) {
+                exerciseCompleted++;
+              }
+            }
+
+            return total + exerciseCompleted;
+          },
+          0
+        );
+
+        return completedCount === expectedSets;
+      })
+      .map((workout) => workout.id)
+  );
+
+  const totalWorkouts = workouts.length;
+  const completedWorkouts = completedWorkoutIds.size;
+
+  // OVERALL PROGRESS IS BASED ON COMPLETED SETS.
   const programmeProgress =
-    totalWorkouts > 0
-      ? Math.round((completedWorkouts / totalWorkouts) * 100)
+    totalSets > 0
+      ? Math.round((completedSets / totalSets) * 100)
       : 0;
 
-  // Fetch the athlete's latest vertical jump test.
-  const { data: jumpLogs } = await supabase
+  // WEEKLY SESSION COMPLETION
+  const weeklyProgress = weeks.map((week) => {
+    const weekWorkouts = workouts.filter(
+      (workout) => workout.week_id === week.id
+    );
+
+    const completedInWeek = weekWorkouts.filter(
+      (workout) => completedWorkoutIds.has(workout.id)
+    ).length;
+
+    return {
+      ...week,
+      workoutCount: weekWorkouts.length,
+      completedCount: completedInWeek,
+    };
+  });
+
+  // FETCH LATEST VERTICAL JUMP TESTS
+  const { data: jumpLogs, error: jumpError } = await supabase
     .from('vertical_jump_logs')
     .select(
       'id, standing_vertical_cm, running_vertical_cm, date_recorded, is_verified'
@@ -97,6 +239,10 @@ export default async function DashboardPage() {
     .eq('profile_id', user.id)
     .order('date_recorded', { ascending: false })
     .limit(5);
+
+  if (jumpError) {
+    console.error('Jump history error:', jumpError.message);
+  }
 
   const latestJump = jumpLogs?.[0] || null;
 
@@ -250,7 +396,7 @@ export default async function DashboardPage() {
                 </div>
 
                 <p className="text-neutral-600 font-mono text-[10px] uppercase tracking-widest mt-3">
-                  Programme sessions
+                  Fully completed sessions
                 </p>
               </div>
 
@@ -274,6 +420,10 @@ export default async function DashboardPage() {
                     style={{ width: `${programmeProgress}%` }}
                   />
                 </div>
+
+                <p className="text-neutral-600 font-mono text-[10px] uppercase tracking-widest mt-3">
+                  {completedSets} / {totalSets} sets completed
+                </p>
               </div>
 
             </div>
@@ -322,29 +472,47 @@ export default async function DashboardPage() {
                     style={{ width: `${programmeProgress}%` }}
                   />
                 </div>
+
+                <p className="text-neutral-500 font-mono text-[10px] uppercase tracking-widest mt-3">
+                  {completedSets} of {totalSets} prescribed sets completed
+                </p>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-8">
-                {[
-                  'Foundations',
-                  'Strength & Balance',
-                  'Landing Preparation',
-                  'Jump Technique',
-                  'Power Development',
-                  'Consolidation',
-                ].map((week, index) => (
-                  <div
-                    key={week}
-                    className="border border-neutral-800 bg-black p-4 rounded"
-                  >
-                    <p className="text-red-600 font-mono text-[10px] uppercase tracking-widest">
-                      Week 0{index + 1}
-                    </p>
-                    <p className="text-white text-xs font-bold uppercase mt-2">
-                      {week}
-                    </p>
-                  </div>
-                ))}
+                {weeklyProgress.map((week, index) => {
+                  const weekProgress =
+                    week.workoutCount > 0
+                      ? Math.round(
+                          (week.completedCount / week.workoutCount) * 100
+                        )
+                      : 0;
+
+                  return (
+                    <div
+                      key={week.id}
+                      className="border border-neutral-800 bg-black p-4 rounded"
+                    >
+                      <p className="text-red-600 font-mono text-[10px] uppercase tracking-widest">
+                        Week {String(week.week_number).padStart(2, '0')}
+                      </p>
+
+                      <p className="text-white text-xs font-bold uppercase mt-2">
+                        {week.focus_description || WEEK_NAMES[index] || 'Training'}
+                      </p>
+
+                      <p className="text-neutral-500 font-mono text-[9px] uppercase tracking-widest mt-3">
+                        {week.completedCount}/{week.workoutCount} Sessions
+                      </p>
+
+                      <div className="w-full h-1 bg-neutral-800 rounded-full mt-2 overflow-hidden">
+                        <div
+                          className="h-full bg-red-600 transition-all"
+                          style={{ width: `${weekProgress}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
 
               <Link
